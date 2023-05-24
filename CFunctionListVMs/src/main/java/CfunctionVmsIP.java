@@ -28,6 +28,7 @@ public class CfunctionVmsIP implements HttpFunction {
         }
         var parser = new Gson();
         var json = parser.toJson(vms.toArray(String[]::new));
+        httpResponse.setContentType("application/json");
         httpResponse.getWriter().write(json);
         httpResponse.getWriter().flush();
     }
