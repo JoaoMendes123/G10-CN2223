@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+// each class is defined in each own file, inside a common package
+
+import "google/protobuf/empty.proto";
+option java_multiple_files = true;
+option java_package = "Contract";
+
+package Contract; // package do proto
+
+service Contract {
+  rpc getIps(Void) returns (ExistingIps);
+  rpc isIpAlive(IpAliveRequest) returns (IpReply);
+  rpc submitImage(stream SubmitImagesRequest) returns (stream SubmitImagesReply);
+  rpc getLandmarkInfo(ImageId) returns (GetImageInfo);
+  rpc getMap(ImageId) returns (GetImageMap);
+  rpc getNamesFromTImage(GetImageNamesWithTRequest) returns (stream GetImageNamesWithTResponse);
+}
+
+message Void {
+
+}
+
+// input messages
+message IpAliveRequest{
+  string ip = 1;
+}
+
+message Image{
+  bytes image = 1;
+}
+
+message SubmitImagesRequest{
+  Image img = 1;
+  //TODO verify what else is needed
+
+}
+
+message GetImageNamesWithTRequest{
+  double t = 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//output messages
+message IpReply {
+  bool alive = 1;
+}
+
+message ExistingIps {
+  repeated string ip = 1;
+}
+
+message ImageId {
+  string id = 1;
+}
+
+message SubmitImagesReply{
+  ImageId id = 1;
+}
+
+message GetImageInfo{
+  string name = 1;
+  string latitude = 2;
+  string longitude = 3;
+  double percentage = 4;
+}
+
+message GetImageMap{
+  bytes map = 1;
+}
+
+message GetImageNamesWithTResponse{
+  string name = 1;
+  string local = 2;
+}
+
