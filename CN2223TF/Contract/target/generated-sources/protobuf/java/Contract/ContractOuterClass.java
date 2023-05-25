@@ -20,11 +20,6 @@ public final class ContractOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Contract_Void_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Contract_IpAliveRequest_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_Contract_IpAliveRequest_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Contract_Image_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -55,11 +50,6 @@ public final class ContractOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Contract_ImageId_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_Contract_SubmitImagesReply_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_Contract_SubmitImagesReply_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Contract_GetImageInfo_descriptor;
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -84,29 +74,26 @@ public final class ContractOuterClass {
   static {
     java.lang.String[] descriptorData = {
       "\n\016Contract.proto\022\010Contract\032\033google/proto" +
-      "buf/empty.proto\"\006\n\004Void\"\034\n\016IpAliveReques" +
-      "t\022\n\n\002ip\030\001 \001(\t\"\026\n\005Image\022\r\n\005image\030\001 \001(\014\"3\n" +
-      "\023SubmitImagesRequest\022\034\n\003img\030\001 \001(\0132\017.Cont" +
-      "ract.Image\"&\n\031GetImageNamesWithTRequest\022" +
-      "\t\n\001t\030\001 \001(\001\"\030\n\007IpReply\022\r\n\005alive\030\001 \001(\010\"\031\n\013" +
-      "ExistingIps\022\n\n\002ip\030\001 \003(\t\"\025\n\007ImageId\022\n\n\002id" +
-      "\030\001 \001(\t\"2\n\021SubmitImagesReply\022\035\n\002id\030\001 \001(\0132" +
-      "\021.Contract.ImageId\"U\n\014GetImageInfo\022\014\n\004na" +
-      "me\030\001 \001(\t\022\020\n\010latitude\030\002 \001(\t\022\021\n\tlongitude\030" +
-      "\003 \001(\t\022\022\n\npercentage\030\004 \001(\001\"\032\n\013GetImageMap" +
-      "\022\013\n\003map\030\001 \001(\014\"9\n\032GetImageNamesWithTRespo" +
-      "nse\022\014\n\004name\030\001 \001(\t\022\r\n\005local\030\002 \001(\t2\231\003\n\010Con" +
-      "tract\022/\n\006getIps\022\016.Contract.Void\032\025.Contra" +
-      "ct.ExistingIps\0228\n\tisIpAlive\022\030.Contract.I" +
-      "pAliveRequest\032\021.Contract.IpReply\022M\n\013subm" +
-      "itImage\022\035.Contract.SubmitImagesRequest\032\033" +
-      ".Contract.SubmitImagesReply(\0010\001\022<\n\017getLa" +
-      "ndmarkInfo\022\021.Contract.ImageId\032\026.Contract" +
-      ".GetImageInfo\0222\n\006getMap\022\021.Contract.Image" +
-      "Id\032\025.Contract.GetImageMap\022a\n\022getNamesFro" +
-      "mTImage\022#.Contract.GetImageNamesWithTReq" +
-      "uest\032$.Contract.GetImageNamesWithTRespon" +
-      "se0\001B\014\n\010ContractP\001b\006proto3"
+      "buf/empty.proto\"\006\n\004Void\"\026\n\005Image\022\r\n\005imag" +
+      "e\030\001 \001(\014\"3\n\023SubmitImagesRequest\022\034\n\003img\030\001 " +
+      "\001(\0132\017.Contract.Image\"&\n\031GetImageNamesWit" +
+      "hTRequest\022\t\n\001t\030\001 \001(\001\"\030\n\007IpReply\022\r\n\005alive" +
+      "\030\001 \001(\010\"\031\n\013ExistingIps\022\n\n\002ip\030\001 \003(\t\"\025\n\007Ima" +
+      "geId\022\n\n\002id\030\001 \001(\t\"U\n\014GetImageInfo\022\014\n\004name" +
+      "\030\001 \001(\t\022\020\n\010latitude\030\002 \001(\t\022\021\n\tlongitude\030\003 " +
+      "\001(\t\022\022\n\npercentage\030\004 \001(\001\"\032\n\013GetImageMap\022\013" +
+      "\n\003map\030\001 \001(\014\"9\n\032GetImageNamesWithTRespons" +
+      "e\022\014\n\004name\030\001 \001(\t\022\r\n\005local\030\002 \001(\t2\365\002\n\010Contr" +
+      "act\022/\n\006getIps\022\016.Contract.Void\032\025.Contract" +
+      ".ExistingIps\022.\n\tisIpAlive\022\016.Contract.Voi" +
+      "d\032\021.Contract.IpReply\0223\n\013submitImage\022\017.Co" +
+      "ntract.Image\032\021.Contract.ImageId0\001\022<\n\017get" +
+      "LandmarkInfo\022\021.Contract.ImageId\032\026.Contra" +
+      "ct.GetImageInfo\0222\n\006getMap\022\021.Contract.Ima" +
+      "geId\032\025.Contract.GetImageMap\022a\n\022getNamesF" +
+      "romTImage\022#.Contract.GetImageNamesWithTR" +
+      "equest\032$.Contract.GetImageNamesWithTResp" +
+      "onse0\001B\014\n\010ContractP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -119,68 +106,56 @@ public final class ContractOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_Void_descriptor,
         new java.lang.String[] { });
-    internal_static_Contract_IpAliveRequest_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_Contract_IpAliveRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_Contract_IpAliveRequest_descriptor,
-        new java.lang.String[] { "Ip", });
     internal_static_Contract_Image_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(1);
     internal_static_Contract_Image_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_Image_descriptor,
         new java.lang.String[] { "Image", });
     internal_static_Contract_SubmitImagesRequest_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_Contract_SubmitImagesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_SubmitImagesRequest_descriptor,
         new java.lang.String[] { "Img", });
     internal_static_Contract_GetImageNamesWithTRequest_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_Contract_GetImageNamesWithTRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_GetImageNamesWithTRequest_descriptor,
         new java.lang.String[] { "T", });
     internal_static_Contract_IpReply_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_Contract_IpReply_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_IpReply_descriptor,
         new java.lang.String[] { "Alive", });
     internal_static_Contract_ExistingIps_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_Contract_ExistingIps_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_ExistingIps_descriptor,
         new java.lang.String[] { "Ip", });
     internal_static_Contract_ImageId_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_Contract_ImageId_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_ImageId_descriptor,
         new java.lang.String[] { "Id", });
-    internal_static_Contract_SubmitImagesReply_descriptor =
-      getDescriptor().getMessageTypes().get(8);
-    internal_static_Contract_SubmitImagesReply_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_Contract_SubmitImagesReply_descriptor,
-        new java.lang.String[] { "Id", });
     internal_static_Contract_GetImageInfo_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_Contract_GetImageInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_GetImageInfo_descriptor,
         new java.lang.String[] { "Name", "Latitude", "Longitude", "Percentage", });
     internal_static_Contract_GetImageMap_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_Contract_GetImageMap_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_GetImageMap_descriptor,
         new java.lang.String[] { "Map", });
     internal_static_Contract_GetImageNamesWithTResponse_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_Contract_GetImageNamesWithTResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Contract_GetImageNamesWithTResponse_descriptor,

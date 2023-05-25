@@ -36,6 +36,26 @@
             <artifactId>grpc-stub</artifactId>
             <version>1.55.1</version>
         </dependency>
+        <dependency>
+            <groupId>ru.noties.todo</groupId>
+            <artifactId>annotations</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.autoscout24.gradle</groupId>
+            <artifactId>gradle-todo-plugin</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jamesstapleton.checkstyle</groupId>
+            <artifactId>checkstyle-ext</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.darwinsys</groupId>
+            <artifactId>todo-datamodel</artifactId>
+            <version>1.0.10</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -58,27 +58,27 @@ public final class ContractGrpc {
     return getGetIpsMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<Contract.IpAliveRequest,
+  private static volatile io.grpc.MethodDescriptor<Contract.Void,
       Contract.IpReply> getIsIpAliveMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "isIpAlive",
-      requestType = Contract.IpAliveRequest.class,
+      requestType = Contract.Void.class,
       responseType = Contract.IpReply.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<Contract.IpAliveRequest,
+  public static io.grpc.MethodDescriptor<Contract.Void,
       Contract.IpReply> getIsIpAliveMethod() {
-    io.grpc.MethodDescriptor<Contract.IpAliveRequest, Contract.IpReply> getIsIpAliveMethod;
+    io.grpc.MethodDescriptor<Contract.Void, Contract.IpReply> getIsIpAliveMethod;
     if ((getIsIpAliveMethod = ContractGrpc.getIsIpAliveMethod) == null) {
       synchronized (ContractGrpc.class) {
         if ((getIsIpAliveMethod = ContractGrpc.getIsIpAliveMethod) == null) {
           ContractGrpc.getIsIpAliveMethod = getIsIpAliveMethod =
-              io.grpc.MethodDescriptor.<Contract.IpAliveRequest, Contract.IpReply>newBuilder()
+              io.grpc.MethodDescriptor.<Contract.Void, Contract.IpReply>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "isIpAlive"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  Contract.IpAliveRequest.getDefaultInstance()))
+                  Contract.Void.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   Contract.IpReply.getDefaultInstance()))
               .setSchemaDescriptor(new ContractMethodDescriptorSupplier("isIpAlive"))
@@ -89,29 +89,29 @@ public final class ContractGrpc {
     return getIsIpAliveMethod;
   }
 
-  private static volatile io.grpc.MethodDescriptor<Contract.SubmitImagesRequest,
-      Contract.SubmitImagesReply> getSubmitImageMethod;
+  private static volatile io.grpc.MethodDescriptor<Contract.Image,
+      Contract.ImageId> getSubmitImageMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "submitImage",
-      requestType = Contract.SubmitImagesRequest.class,
-      responseType = Contract.SubmitImagesReply.class,
-      methodType = io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
-  public static io.grpc.MethodDescriptor<Contract.SubmitImagesRequest,
-      Contract.SubmitImagesReply> getSubmitImageMethod() {
-    io.grpc.MethodDescriptor<Contract.SubmitImagesRequest, Contract.SubmitImagesReply> getSubmitImageMethod;
+      requestType = Contract.Image.class,
+      responseType = Contract.ImageId.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
+  public static io.grpc.MethodDescriptor<Contract.Image,
+      Contract.ImageId> getSubmitImageMethod() {
+    io.grpc.MethodDescriptor<Contract.Image, Contract.ImageId> getSubmitImageMethod;
     if ((getSubmitImageMethod = ContractGrpc.getSubmitImageMethod) == null) {
       synchronized (ContractGrpc.class) {
         if ((getSubmitImageMethod = ContractGrpc.getSubmitImageMethod) == null) {
           ContractGrpc.getSubmitImageMethod = getSubmitImageMethod =
-              io.grpc.MethodDescriptor.<Contract.SubmitImagesRequest, Contract.SubmitImagesReply>newBuilder()
-              .setType(io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
+              io.grpc.MethodDescriptor.<Contract.Image, Contract.ImageId>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "submitImage"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  Contract.SubmitImagesRequest.getDefaultInstance()))
+                  Contract.Image.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  Contract.SubmitImagesReply.getDefaultInstance()))
+                  Contract.ImageId.getDefaultInstance()))
               .setSchemaDescriptor(new ContractMethodDescriptorSupplier("submitImage"))
               .build();
         }
@@ -270,16 +270,16 @@ public final class ContractGrpc {
 
     /**
      */
-    public void isIpAlive(Contract.IpAliveRequest request,
+    public void isIpAlive(Contract.Void request,
         io.grpc.stub.StreamObserver<Contract.IpReply> responseObserver) {
       asyncUnimplementedUnaryCall(getIsIpAliveMethod(), responseObserver);
     }
 
     /**
      */
-    public io.grpc.stub.StreamObserver<Contract.SubmitImagesRequest> submitImage(
-        io.grpc.stub.StreamObserver<Contract.SubmitImagesReply> responseObserver) {
-      return asyncUnimplementedStreamingCall(getSubmitImageMethod(), responseObserver);
+    public void submitImage(Contract.Image request,
+        io.grpc.stub.StreamObserver<Contract.ImageId> responseObserver) {
+      asyncUnimplementedUnaryCall(getSubmitImageMethod(), responseObserver);
     }
 
     /**
@@ -316,15 +316,15 @@ public final class ContractGrpc {
             getIsIpAliveMethod(),
             asyncUnaryCall(
               new MethodHandlers<
-                Contract.IpAliveRequest,
+                Contract.Void,
                 Contract.IpReply>(
                   this, METHODID_IS_IP_ALIVE)))
           .addMethod(
             getSubmitImageMethod(),
-            asyncBidiStreamingCall(
+            asyncServerStreamingCall(
               new MethodHandlers<
-                Contract.SubmitImagesRequest,
-                Contract.SubmitImagesReply>(
+                Contract.Image,
+                Contract.ImageId>(
                   this, METHODID_SUBMIT_IMAGE)))
           .addMethod(
             getGetLandmarkInfoMethod(),
@@ -375,7 +375,7 @@ public final class ContractGrpc {
 
     /**
      */
-    public void isIpAlive(Contract.IpAliveRequest request,
+    public void isIpAlive(Contract.Void request,
         io.grpc.stub.StreamObserver<Contract.IpReply> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getIsIpAliveMethod(), getCallOptions()), request, responseObserver);
@@ -383,10 +383,10 @@ public final class ContractGrpc {
 
     /**
      */
-    public io.grpc.stub.StreamObserver<Contract.SubmitImagesRequest> submitImage(
-        io.grpc.stub.StreamObserver<Contract.SubmitImagesReply> responseObserver) {
-      return asyncBidiStreamingCall(
-          getChannel().newCall(getSubmitImageMethod(), getCallOptions()), responseObserver);
+    public void submitImage(Contract.Image request,
+        io.grpc.stub.StreamObserver<Contract.ImageId> responseObserver) {
+      asyncServerStreamingCall(
+          getChannel().newCall(getSubmitImageMethod(), getCallOptions()), request, responseObserver);
     }
 
     /**
@@ -437,9 +437,17 @@ public final class ContractGrpc {
 
     /**
      */
-    public Contract.IpReply isIpAlive(Contract.IpAliveRequest request) {
+    public Contract.IpReply isIpAlive(Contract.Void request) {
       return blockingUnaryCall(
           getChannel(), getIsIpAliveMethod(), getCallOptions(), request);
+    }
+
+    /**
+     */
+    public java.util.Iterator<Contract.ImageId> submitImage(
+        Contract.Image request) {
+      return blockingServerStreamingCall(
+          getChannel(), getSubmitImageMethod(), getCallOptions(), request);
     }
 
     /**
@@ -490,7 +498,7 @@ public final class ContractGrpc {
     /**
      */
     public com.google.common.util.concurrent.ListenableFuture<Contract.IpReply> isIpAlive(
-        Contract.IpAliveRequest request) {
+        Contract.Void request) {
       return futureUnaryCall(
           getChannel().newCall(getIsIpAliveMethod(), getCallOptions()), request);
     }
@@ -514,10 +522,10 @@ public final class ContractGrpc {
 
   private static final int METHODID_GET_IPS = 0;
   private static final int METHODID_IS_IP_ALIVE = 1;
-  private static final int METHODID_GET_LANDMARK_INFO = 2;
-  private static final int METHODID_GET_MAP = 3;
-  private static final int METHODID_GET_NAMES_FROM_TIMAGE = 4;
-  private static final int METHODID_SUBMIT_IMAGE = 5;
+  private static final int METHODID_SUBMIT_IMAGE = 2;
+  private static final int METHODID_GET_LANDMARK_INFO = 3;
+  private static final int METHODID_GET_MAP = 4;
+  private static final int METHODID_GET_NAMES_FROM_TIMAGE = 5;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -541,8 +549,12 @@ public final class ContractGrpc {
               (io.grpc.stub.StreamObserver<Contract.ExistingIps>) responseObserver);
           break;
         case METHODID_IS_IP_ALIVE:
-          serviceImpl.isIpAlive((Contract.IpAliveRequest) request,
+          serviceImpl.isIpAlive((Contract.Void) request,
               (io.grpc.stub.StreamObserver<Contract.IpReply>) responseObserver);
+          break;
+        case METHODID_SUBMIT_IMAGE:
+          serviceImpl.submitImage((Contract.Image) request,
+              (io.grpc.stub.StreamObserver<Contract.ImageId>) responseObserver);
           break;
         case METHODID_GET_LANDMARK_INFO:
           serviceImpl.getLandmarkInfo((Contract.ImageId) request,
@@ -566,9 +578,6 @@ public final class ContractGrpc {
     public io.grpc.stub.StreamObserver<Req> invoke(
         io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
-        case METHODID_SUBMIT_IMAGE:
-          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.submitImage(
-              (io.grpc.stub.StreamObserver<Contract.SubmitImagesReply>) responseObserver);
         default:
           throw new AssertionError();
       }

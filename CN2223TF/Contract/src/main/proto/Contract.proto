@@ -10,8 +10,8 @@ package Contract; // package do proto
 
 service Contract {
   rpc getIps(Void) returns (ExistingIps);
-  rpc isIpAlive(IpAliveRequest) returns (IpReply);
-  rpc submitImage(stream SubmitImagesRequest) returns (stream SubmitImagesReply);
+  rpc isIpAlive(Void) returns (IpReply);
+  rpc submitImage(Image) returns (stream ImageId);
   rpc getLandmarkInfo(ImageId) returns (GetImageInfo);
   rpc getMap(ImageId) returns (GetImageMap);
   rpc getNamesFromTImage(GetImageNamesWithTRequest) returns (stream GetImageNamesWithTResponse);
@@ -22,9 +22,6 @@ message Void {
 }
 
 // input messages
-message IpAliveRequest{
-  string ip = 1;
-}
 
 message Image{
   bytes image = 1;
@@ -44,7 +41,7 @@ message GetImageNamesWithTRequest{
 
 //output messages
 message IpReply {
-  bool alive = 1;
+  bool alive=1;
 }
 
 message ExistingIps {
@@ -55,9 +52,6 @@ message ImageId {
   string id = 1;
 }
 
-message SubmitImagesReply{
-  ImageId id = 1;
-}
 
 message GetImageInfo{
   string name = 1;

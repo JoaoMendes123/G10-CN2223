@@ -31,5 +31,6 @@ public class CfunctionVmsIP implements HttpFunction {
         httpResponse.setContentType("application/json");
         httpResponse.getWriter().write(json);
         httpResponse.getWriter().flush();
+        //TODO make it repeat if it fails
     }
 }
