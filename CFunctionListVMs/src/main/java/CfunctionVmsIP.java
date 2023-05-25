@@ -11,8 +11,8 @@ import java.util.ArrayList;
 public class CfunctionVmsIP implements HttpFunction {
 
     private static final String PROJECT_ID = "cn2223-t1-g10";
-    private static final String GROUP_ZONE = "europe-north1-b";
-    private static final String GROUP_NAME = "instance-group-apprest";
+    private static final String GROUP_ZONE = "europe-southwest1-a";
+    private static final String GROUP_NAME = "test-contract";
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
         ArrayList<String> vms = new ArrayList<>();
