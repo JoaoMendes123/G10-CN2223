@@ -50,12 +50,12 @@ public class Main {
             ips = getRunningVMsIps();
             IpReply alive;
             do {
-                /**if(ips.length == 0){
+                if(ips.length == 0){
                  System.out.println("Couldn't find any instances running...");
                  System.exit(1);
-                }*/
+                }
                 int idx = (int)(Math.random()*ips.length);
-                String pick = "34.175.170.151";
+                String pick = ips[idx];
                 System.out.println("Connecting to " + pick);
                 channel = ManagedChannelBuilder.forAddress(pick, SERVER_PORT)
                         .usePlaintext().build();

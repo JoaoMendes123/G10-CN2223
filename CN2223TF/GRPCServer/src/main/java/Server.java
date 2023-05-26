@@ -11,13 +11,14 @@ public class Server {
             svc = ServerBuilder.forPort(SERVER_PORT).addService(new ContractMockImplementation()).build();
             svc.start();
             System.out.println("Server is listening on port "+ SERVER_PORT);
-            Scanner in = new Scanner(System.in);in.nextLine();
+            Scanner in = new Scanner(System.in);
+            while(!in.hasNextInt()){
+            }
             svc.shutdown();
         }catch(Exception e){
             System.out.println("Something went wrong:" + e.toString());
             svc.shutdownNow();
         }
-        System.out.println("Hello, gRPC world!");
     }
 
 }
