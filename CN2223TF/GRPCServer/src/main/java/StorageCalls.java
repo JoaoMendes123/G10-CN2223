@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class StorageCalls {
@@ -34,7 +35,14 @@ public class StorageCalls {
                         .build());
         logger.info("created new bucket " + bucketName);
     }
-
+    public String[] listExistingBlobs(){
+        Bucket bucket = storage.get(bucketName);
+        ArrayList<String> res = new ArrayList<>();
+        for (Blob blob : bucket.list().iterateAll()) {
+            res.add(blob.getName());
+        }
+        return res.toArray(String[]::new);
+    }
     public String uploadBlobToBucket(byte[] content, String imageName, String type) throws Exception {
         String generatedID = Integer.toString((int)(Math.random()*100));
         String[] aux = imageName.split("\\.");
