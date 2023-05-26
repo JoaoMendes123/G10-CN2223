@@ -12,7 +12,7 @@ public class CfunctionVmsIP implements HttpFunction {
 
     private static final String PROJECT_ID = "cn2223-t1-g10";
     private static final String GROUP_ZONE = "europe-southwest1-a";
-    private static final String GROUP_NAME = "test-contract";
+    private static final String GROUP_NAME = "cn2223-mock-group";
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
         ArrayList<String> vms = new ArrayList<>();
