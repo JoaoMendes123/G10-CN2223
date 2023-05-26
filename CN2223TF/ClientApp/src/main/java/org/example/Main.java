@@ -5,6 +5,7 @@ import Contract.Void;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import jdk.jshell.execution.Util;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,6 +13,9 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -50,12 +54,12 @@ public class Main {
             ips = getRunningVMsIps();
             IpReply alive;
             do {
-                if(ips.length == 0){
+                /**if(ips.length == 0){
                  System.out.println("Couldn't find any instances running...");
                  System.exit(1);
-                }
+                }*/
                 int idx = (int)(Math.random()*ips.length);
-                String pick = ips[idx];
+                String pick = "localhost";
                 System.out.println("Connecting to " + pick);
                 channel = ManagedChannelBuilder.forAddress(pick, SERVER_PORT)
                         .usePlaintext().build();
@@ -99,24 +103,39 @@ public class Main {
         System.exit(1);
     }
 
-    //TODO
     public static void submitImage() {
-        BufferedImage image = null;
         try {
-            image = ImageIO.read(new File("/Users/joaomendes/Desktop/CN/G10-CN2223/CN2223TF/FotoNasa.jpg"));
-            byte[] imageBytes = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
-            Image i = Image.newBuilder().setImage(ByteString.copyFrom(imageBytes)).build();
-            ReplyObserver<ImageId> reply = new ReplyObserver<>();
-            stub.submitImage(i, reply);
-            while(!reply.isCompleted()){
-                logger.warning("waiting for server answer to complete...");
-                Thread.sleep(200);
+            Scanner in = new Scanner(System.in);
+            System.out.println("Provide absolute path to image :");
+            if(in.hasNext()) {
+                Path p = Paths.get(in.nextLine());
+                String type = Files.probeContentType(p);
+                String name = p.getFileName().toString();
+                byte[] image = Utils.imageToByteArray(p);
+                executeSubmitImageRequest(image, name, type);
             }
-            System.out.println(reply.getReplies().get(0));
+
         } catch (IOException | InterruptedException e) {
             logger.warning(e.getMessage());
             throw new RuntimeException(e);
         }
 
+    }
+    public static void executeSubmitImageRequest(byte[] image, String name, String type) throws InterruptedException {
+        Image i = Image.newBuilder()
+                .setImage(ByteString.copyFrom(image))
+                .setName(name)
+                .setType(type)
+                .build();
+        ReplyObserver<ImageId> reply = new ReplyObserver<>();
+        stub.submitImage(i, reply);
+        while(!reply.isCompleted()){
+            logger.warning("waiting for server answer to complete...");
+            Thread.sleep(200);
+        }
+        if(!reply.OnSuccess()){
+            System.out.println("Something went wrong");
+        }
+        System.out.println(reply.getReplies().get(0));
     }
 }
