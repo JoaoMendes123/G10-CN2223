@@ -49,8 +49,4 @@ public class Utils {
         return ips;
     }
 
-    public static byte[] imageToByteArray(Path p) throws IOException {
-        return Files.readAllBytes(p);
-    }
-
 }

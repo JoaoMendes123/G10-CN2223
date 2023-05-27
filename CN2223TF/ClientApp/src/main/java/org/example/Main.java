@@ -111,7 +111,7 @@ public class Main {
                 Path p = Paths.get(in.nextLine());
                 String type = Files.probeContentType(p);
                 String name = p.getFileName().toString();
-                byte[] image = Utils.imageToByteArray(p);
+                byte[] image = Files.readAllBytes(p);
                 executeSubmitImageRequest(image, name, type);
             }
 

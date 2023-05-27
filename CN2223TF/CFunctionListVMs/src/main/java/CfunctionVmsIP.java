@@ -5,7 +5,7 @@ import com.google.cloud.functions.HttpRequest;
 import com.google.cloud.functions.HttpResponse;
 import com.google.gson.Gson;
 
-import java.lang.reflect.Array;
+
 import java.util.ArrayList;
 
 public class CfunctionVmsIP implements HttpFunction {
@@ -16,21 +16,23 @@ public class CfunctionVmsIP implements HttpFunction {
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws Exception {
         ArrayList<String> vms = new ArrayList<>();
+        var parser = new Gson();
         try (InstancesClient client = InstancesClient.create()) {
             for (Instance curInst : client.list(PROJECT_ID, GROUP_ZONE).iterateAll()) {
-                if (curInst.getName().contains(GROUP_NAME)) {
-                    if(curInst.getStatus().equals("RUNNING")){
-                        String ip = curInst.getNetworkInterfaces(0).getAccessConfigs(0).getNatIP();
-                        vms.add(ip);
-                    }
+                if (curInst.getName().contains(GROUP_NAME) && curInst.getStatus().equals("RUNNING")) {
+                    String ip = curInst.getNetworkInterfaces(0).getAccessConfigs(0).getNatIP();
+                    vms.add(ip);
+
                 }
             }
+            var json = parser.toJson(vms.toArray(String[]::new));
+            httpResponse.setContentType("application/json");
+            httpResponse.getWriter().write(json);
+            httpResponse.getWriter().flush();
+        }catch (Exception e){
+            httpResponse.setContentType("application/json");
+            httpResponse.setStatusCode(500);
+            httpResponse.getWriter().write(parser.toJson("Error Ocurred: " + e.getMessage()));
         }
-        var parser = new Gson();
-        var json = parser.toJson(vms.toArray(String[]::new));
-        httpResponse.setContentType("application/json");
-        httpResponse.getWriter().write(json);
-        httpResponse.getWriter().flush();
-        //TODO make it repeat if it fails
     }
 }

@@ -24,7 +24,6 @@ public class LandmarkDetector {
 
     // A variável de ambiente GOOGLE_APPLICATION_CREDENTIALS
     // deve ter conta de serviço com as roles: Storage Admin + VisionAI Admin
-    // API_KEY = AIzaSyCwaz5XCU-v6PxwXHLTfMHK7Z42_ctb3Yk
 
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
@@ -32,6 +31,9 @@ public class LandmarkDetector {
             System.out.println("Usage: java -jar LandmarkDetector.jar <API_KEY>");
             System.exit(1);
         }
+        //prepare pub/sub
+        //on watcher user landmarks app
+
         detectAllLandmarksGcs(args[0]);
     }
 
