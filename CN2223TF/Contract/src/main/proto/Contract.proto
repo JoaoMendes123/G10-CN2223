@@ -25,10 +25,13 @@ message Void {
 
 message Image{
   bytes image = 1;
+  string name = 2;
+  string type = 3;
 }
 
 message SubmitImagesRequest{
   Image img = 1;
+
   //TODO verify what else is needed
 
 }

@@ -1,13 +1,22 @@
 package org.example;
 
+import Contract.Image;
+import Contract.ImageId;
 import com.google.gson.Gson;
+import com.google.protobuf.ByteString;
 
+import javax.imageio.ImageIO;
+import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Utils {
     private static final String cFunctionURL = "https://europe-west1-cn2223-t1-g10.cloudfunctions.net/getRunningVms";
@@ -38,6 +47,10 @@ public class Utils {
             System.out.println(ip);
         }
         return ips;
+    }
+
+    public static byte[] imageToByteArray(Path p) throws IOException {
+        return Files.readAllBytes(p);
     }
 
 }
