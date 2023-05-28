@@ -19,7 +19,7 @@ public class MessageMockHandler implements MessageReceiver {
         //Process message and log to Firestore.
         try {
             //pretend some work
-            logger.info("Received following message: " + pubsubMessage.getData());
+            logger.info("Received following message: " + pubsubMessage.getData().toStringUtf8());
             //go to storage and get image
             //send it to landmarksDetector
             //save image in storage maps directory

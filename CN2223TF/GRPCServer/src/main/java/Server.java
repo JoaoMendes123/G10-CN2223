@@ -1,6 +1,8 @@
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.pubsub.v1.TopicName;
 import io.grpc.ServerBuilder;
 import java.io.IOException;
 import java.util.Scanner;
