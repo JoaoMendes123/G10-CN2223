@@ -1,14 +1,8 @@
 import com.google.cloud.WriteChannel;
-import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.storage.*;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -16,6 +10,9 @@ public class StorageCalls {
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
     private final String bucketName;
     private final Storage storage;
+
+    private final String IMAGES_DIRECTORY = "images/";
+    private final String MAPS_DIRECTORY = "maps/";
 
     public StorageCalls(Storage storage, String bucketName) {
         this.storage = storage;
@@ -43,10 +40,10 @@ public class StorageCalls {
         }
         return res.toArray(String[]::new);
     }
-    public String uploadBlobToBucket(byte[] content, String imageName, String type) throws Exception {
+    public String uploadImageToBucket(byte[] content, String imageName, String type) throws Exception {
         String generatedID = Integer.toString((int)(Math.random()*100));
         String[] aux = imageName.split("\\.");
-        String blobName= aux[0] + generatedID + "." +aux[1];
+        String blobName= IMAGES_DIRECTORY + aux[0] + generatedID + "." +aux[1];//ex: images/fotoname.jpg
         BlobId blobId = BlobId.of(bucketName, blobName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(type).build();
 
@@ -87,4 +84,7 @@ public class StorageCalls {
         logger.info("Blob " + blobName + " is now public");
     }
 
+    public String getBucketName(){
+        return bucketName;
+    }
 }

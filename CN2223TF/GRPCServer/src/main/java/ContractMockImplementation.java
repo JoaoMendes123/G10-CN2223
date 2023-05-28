@@ -1,16 +1,18 @@
 import Contract.*;
 import Contract.Void;
-import com.google.cloud.firestore.CollectionReference;
 import io.grpc.stub.StreamObserver;
 
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class ContractMockImplementation extends ContractGrpc.ContractImplBase {
     public static Logger logger = Logger.getLogger(Server.class.getName());
     private final StorageCalls storage;
+    private final PubSubCalls pubSub;
 
-    public ContractMockImplementation(StorageCalls storage){
+    public ContractMockImplementation(StorageCalls storage, PubSubCalls pubSub){
         this.storage = storage;
+        this.pubSub = pubSub;
     }
     @Override
     public void isIpAlive(Void request, StreamObserver<IpReply> responseObserver) {
@@ -23,9 +25,14 @@ public class ContractMockImplementation extends ContractGrpc.ContractImplBase {
     public void submitImage(Image request, StreamObserver<ImageId> responseObserver) {
         byte[] img = request.getImage().toByteArray();
         try {
-            String blobId = storage.uploadBlobToBucket(img, request.getName(), request.getType());
-            responseObserver.onNext(ImageId.newBuilder().setId(blobId).build());
+            //RequestId to return to client for later interactions
+            String requestID = UUID.randomUUID().toString().substring(0,4);
+            String blobId = storage.uploadImageToBucket(img, request.getName(), request.getType());
+            pubSub.sendMessage(blobId, storage.getBucketName(), requestID);
+
+            responseObserver.onNext(ImageId.newBuilder().setId(requestID).build());
             responseObserver.onCompleted();
+
             logger.info("Completed submitImage()");
         } catch (Exception e) {
             throw new RuntimeException(e);

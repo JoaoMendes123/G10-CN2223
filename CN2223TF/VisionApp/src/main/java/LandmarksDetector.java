@@ -11,41 +11,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
-
-
-public class LandmarkDetector {
+//TODO
+public class LandmarksDetector {
     final static int ZOOM = 15; // Streets
     final static String SIZE = "600x300";
     // Considera-se que o nomes de imagens correspondem aos nomes de BLOB
     // existentes num bucket de nome BUCKET_NAME no Storage do Projeto
     final static String BUCKET_NAME="cn2223tf_bucket";
+    private final String API_KEY;
     static String[] images = {"TorreBelem.jpg", "CristoRei-Almada.jpg", "TajMahal.jpg"};
 
-    // A variável de ambiente GOOGLE_APPLICATION_CREDENTIALS
-    // deve ter conta de serviço com as roles: Storage Admin + VisionAI Admin
-
-    public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            System.out.println("API Key missing");
-            System.out.println("Usage: java -jar LandmarkDetector.jar <API_KEY>");
-            System.exit(1);
-        }
-        //prepare pub/sub
-        //on watcher user landmarks app
-
-        detectAllLandmarksGcs(args[0]);
+    public LandmarksDetector(String apiKey){
+        this.API_KEY = apiKey;
     }
 
-    public static void detectAllLandmarksGcs(String apiKey) throws IOException {
+    public void detectAllLandmarksGcs() throws IOException {
         for (String name : images) {
             String blobGsPath = "gs://"+BUCKET_NAME+"/" + name;
-            detectLandmarksGcs(blobGsPath, apiKey);
+            detectLandmarksGcs(blobGsPath);
         }
     }
 
     // Detects landmarks in the specified remote image on Google Cloud Storage.
-    public static void detectLandmarksGcs(String blobGsPath, String apiKey) throws IOException {
+
+    private void detectLandmarksGcs(String blobGsPath) throws IOException {
         System.out.println("Detecting landmarks for: " + blobGsPath);
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
@@ -79,7 +68,7 @@ public class LandmarkDetector {
                             annotation.getScore(),
                             info.getLatLng());
                     if (first) {
-                        getStaticMapSaveImage(info.getLatLng(), apiKey);
+                        getStaticMapSaveImage(info.getLatLng());
                         first = false;
                     }
                 }
@@ -87,12 +76,12 @@ public class LandmarkDetector {
         }
     }
 
-    private static void getStaticMapSaveImage(LatLng latLng, String apiKey) {
+    private void getStaticMapSaveImage(LatLng latLng) {
         String mapUrl = "https://maps.googleapis.com/maps/api/staticmap?"
                 + "center=" + latLng.getLatitude() + "," + latLng.getLongitude()
                 + "&zoom=" + ZOOM
                 + "&size=" + SIZE
-                + "&key=" + apiKey;
+                + "&key=" + API_KEY;
         System.out.println(mapUrl);
         try {
             URL url = new URL(mapUrl);
@@ -113,4 +102,6 @@ public class LandmarkDetector {
             e.printStackTrace();
         }
     }
+
+
 }
