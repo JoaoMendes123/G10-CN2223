@@ -1,3 +1,4 @@
+import FirestoreDocumentObjects.LandmarkResult;
 import com.google.cloud.vision.v1.*;
 import com.google.type.LatLng;
 
@@ -10,32 +11,37 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 //TODO
 public class LandmarksDetector {
     final static int ZOOM = 15; // Streets
     final static String SIZE = "600x300";
+
     // Considera-se que o nomes de imagens correspondem aos nomes de BLOB
     // existentes num bucket de nome BUCKET_NAME no Storage do Projeto
-    final static String BUCKET_NAME="cn2223tf_bucket";
+
     private final String API_KEY;
-    static String[] images = {"TorreBelem.jpg", "CristoRei-Almada.jpg", "TajMahal.jpg"};
+
+    private final Logger logger = Logger.getLogger(LandmarksDetector.class.getName());
 
     public LandmarksDetector(String apiKey){
         this.API_KEY = apiKey;
     }
 
-    public void detectAllLandmarksGcs() throws IOException {
-        for (String name : images) {
-            String blobGsPath = "gs://"+BUCKET_NAME+"/" + name;
-            detectLandmarksGcs(blobGsPath);
+    public List<LandmarkResult> detectLandmark(String bucketName, String blobName){
+        try {
+            String blobGsPath = "gs://"+bucketName+"/" + blobName;
+            return detectLandmarksGcs(blobGsPath);
+        }catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     // Detects landmarks in the specified remote image on Google Cloud Storage.
 
-    private void detectLandmarksGcs(String blobGsPath) throws IOException {
-        System.out.println("Detecting landmarks for: " + blobGsPath);
+    private List<LandmarkResult> detectLandmarksGcs(String blobGsPath) throws IOException {
+        logger.info("Detecting landmarks for: " + blobGsPath);
         List<AnnotateImageRequest> requests = new ArrayList<>();
 
         ImageSource imgSource = ImageSource.newBuilder().setGcsImageUri(blobGsPath).build();
@@ -54,26 +60,31 @@ public class LandmarksDetector {
 
             for (AnnotateImageResponse res : responses) {
                 if (res.hasError()) {
-                    System.out.format("Error: %s%n", res.getError().getMessage());
-                    return;
+                    logger.warning("Error: " + res.getError().getMessage());
+                    return null;
                 }
 
-                System.out.println("Landmarks list size: " + res.getLandmarkAnnotationsList().size());
+                logger.info("Landmarks list size: " + res.getLandmarkAnnotationsList().size());
+                ArrayList<LandmarkResult> results = new ArrayList<>(res.getLandmarkAnnotationsList().size());
                 // For full list of available annotations, see http://g.co/cloud/vision/docs
-                boolean first = true; // Only get map for first annotation
                 for (EntityAnnotation annotation : res.getLandmarkAnnotationsList()) {
                     LocationInfo info = annotation.getLocationsList().listIterator().next();
-                    System.out.format("Landmark: %s(%f)%n %s%n",
+                    LandmarkResult lResult = new LandmarkResult(
                             annotation.getDescription(),
-                            annotation.getScore(),
-                            info.getLatLng());
-                    if (first) {
-                        getStaticMapSaveImage(info.getLatLng());
-                        first = false;
-                    }
+                            info.getLatLng(),
+                            annotation.getScore()
+                    );
+                    results.add(lResult);
+                    logger.info(
+                            "Landmark name:" + lResult.name
+                                    + "\nLandmark coordinates: " + lResult.coordinates
+                                    + "Landmark score: " + lResult.score + "\n"
+                    );
                 }
+                return results;
             }
         }
+        return new ArrayList<LandmarkResult>();
     }
 
     private void getStaticMapSaveImage(LatLng latLng) {

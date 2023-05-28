@@ -1,5 +1,10 @@
 import com.google.api.gax.core.ExecutorProvider;
 import com.google.api.gax.core.InstantiatingExecutorProvider;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
 import com.google.cloud.pubsub.v1.TopicAdminClient;
@@ -15,7 +20,9 @@ public class LandmarksApp {
     final static String TOPIC_ID = "cn2223tf-topic";
     final static String SUBSCRIPTION_NAME = "cn2223tf-requests";
 
-    public static void main(String[] args){
+    final static String COLLECTION_NAME = "cn2223tf-collection";
+
+    public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             System.out.println("API Key missing");
             System.out.println("Usage: java -jar LandmarkDetector.jar <API_KEY>");
@@ -25,9 +32,15 @@ public class LandmarksApp {
         //Landmark App creates a subscription to the topic and subscribes to it
         //If it already exists subscribes to it
         //Work-queue pattern
+        Credentials cred = GoogleCredentials.getApplicationDefault();
+        FirestoreOptions fOptions = FirestoreOptions.newBuilder().setCredentials(cred).build();
+        Firestore db = fOptions.getService();
+        CollectionReference colRef = db.collection(COLLECTION_NAME);
+
+
         TopicName topic = createTopic();
         SubscriptionName sub = createSubscriptionToTopic(topic);
-        MessageMockHandler handler = new MessageMockHandler(new LandmarksDetector(args[0]));
+        MessageMockHandler handler = new MessageMockHandler(new LandmarksDetector(args[0]), new FirestoreCalls(colRef));
         Subscriber subscriber = createSubscriber(sub.getSubscription(), handler);
         subscriber.startAsync().awaitRunning();
         //I don't know if subscription is ever deleted, might be a problem.
