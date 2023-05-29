@@ -5,12 +5,7 @@ import Contract.Void;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import jdk.jshell.execution.Util;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -39,6 +34,7 @@ public class Main {
                     var pick = in.nextInt();
                     switch (pick){
                         case 0 : submitImage();break;
+                        case 1 : getLandmarks();break;
                         case 99 : shutdown();break;
                     }
                 }
@@ -86,6 +82,7 @@ public class Main {
     public static void printMenu(){
         System.out.println("### Menu ###");
         System.out.println("0 - submitImage()");
+        System.out.println("1 - getLandMarks()");
         System.out.println("99 - exit()");
         //TODO
     }
@@ -137,5 +134,33 @@ public class Main {
             System.out.println("Something went wrong");
         }
         System.out.println(reply.getReplies().get(0));
+    }
+
+    public static void getLandmarks(){
+        try {
+            Scanner in = new Scanner(System.in);
+            System.out.println("Please enter requestId:");
+            if(in.hasNext()) {
+                ImageId id = ImageId.newBuilder().setId(in.next()).build();
+                ReplyObserver<LandmarkProtoResult> reply = new ReplyObserver<>();
+                stub.getLandmarksFromRequest(id,reply);
+                while(!reply.isCompleted()){
+                    logger.warning("waiting for server answer to complete...");
+                    Thread.sleep(200);
+                }
+                for (LandmarkProtoResult res: reply.getReplies()) {
+                    System.out.format("Landmark Name: %s\n Coordinates: \n\tLatitude =%,.10f\n\tLongitude =%,.10f\nscore:%,.10f\n",
+                            res.getName(),
+                            res.getLatitude(),
+                            res.getLongitude(),
+                            res.getPercentage()
+                            );
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.warning(e.getMessage());
+            throw new RuntimeException(e);
+        }
+
     }
 }

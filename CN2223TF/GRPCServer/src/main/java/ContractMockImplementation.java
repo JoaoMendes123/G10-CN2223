@@ -1,7 +1,12 @@
 import Contract.*;
+import Contract.LandmarkProtoResult;
 import Contract.Void;
+import com.google.cloud.firestore.DocumentSnapshot;
 import io.grpc.stub.StreamObserver;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -9,10 +14,12 @@ public class ContractMockImplementation extends ContractGrpc.ContractImplBase {
     public static Logger logger = Logger.getLogger(Server.class.getName());
     private final StorageCalls storage;
     private final PubSubCalls pubSub;
+    private final FirestoreCalls fireStore;
 
-    public ContractMockImplementation(StorageCalls storage, PubSubCalls pubSub){
+    public ContractMockImplementation(StorageCalls storage, PubSubCalls pubSub, FirestoreCalls fireStore){
         this.storage = storage;
         this.pubSub = pubSub;
+        this.fireStore = fireStore;
     }
     @Override
     public void isIpAlive(Void request, StreamObserver<IpReply> responseObserver) {
@@ -40,14 +47,30 @@ public class ContractMockImplementation extends ContractGrpc.ContractImplBase {
     }
 
     @Override
-    public void getMap(ImageId request, StreamObserver<GetImageMap> responseObserver) {
-        //TODO
-        super.getMap(request, responseObserver);
-    }
-
-    @Override
-    public void getLandmarkInfo(ImageId request, StreamObserver<GetImageInfo> responseObserver) {
-        //TODO
-        super.getLandmarkInfo(request, responseObserver);
+    public void getLandmarksFromRequest(ImageId request, StreamObserver<LandmarkProtoResult> responseObserver) {
+        String id = request.getId();
+        DocumentSnapshot doc = fireStore.getDocumentById(id);
+        if(doc.exists()){
+            Map<String,Object> loggedDoc = doc.getData();
+            ArrayList<Map<String, Object>> results = (ArrayList<Map<String, Object>>)loggedDoc.get("results");
+            for (Map<String, Object> idx: results) {
+                double score = (double)idx.get("score");
+                String name = (String)idx.get("name");
+                Map<String, Object> coordinates = (Map<String, Object>)idx.get("coordinates");
+                double latitude = (double)coordinates.get("latitude");
+                double longitude = (double)coordinates.get("longitude");
+                LandmarkProtoResult res =  LandmarkProtoResult.newBuilder()
+                        .setLatitude(latitude)
+                        .setLongitude(longitude)
+                        .setPercentage((float)score)
+                        .setName(name)
+                        .build();
+                responseObserver.onNext(res);
+            }
+            responseObserver.onCompleted();
+        }else{
+            responseObserver.onError(new Exception("Couldn't find referenced document"));
+            responseObserver.onCompleted();
+        }
     }
 }

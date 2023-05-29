@@ -9,11 +9,10 @@ option java_package = "Contract";
 package Contract; // package do proto
 
 service Contract {
-  rpc getIps(Void) returns (ExistingIps);
   rpc isIpAlive(Void) returns (IpReply);
   rpc submitImage(Image) returns (stream ImageId);
-  rpc getLandmarkInfo(ImageId) returns (GetImageInfo);
-  rpc getMap(ImageId) returns (GetImageMap);
+  rpc getLandmarksFromRequest(ImageId) returns (stream LandmarkProtoResult);
+  rpc getMap(MapChoice) returns (GetImageMap);
   rpc getNamesFromTImage(GetImageNamesWithTRequest) returns (stream GetImageNamesWithTResponse);
 }
 
@@ -29,15 +28,14 @@ message Image{
   string type = 3;
 }
 
-message SubmitImagesRequest{
-  Image img = 1;
-
-  //TODO verify what else is needed
-
-}
-
 message GetImageNamesWithTRequest{
   double t = 1;
+}
+
+message MapChoice{
+  string id = 1;
+  uint32 choice = 2;
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,11 +54,11 @@ message ImageId {
 }
 
 
-message GetImageInfo{
+message LandmarkProtoResult{
   string name = 1;
-  string latitude = 2;
-  string longitude = 3;
-  double percentage = 4;
+  double latitude = 2;
+  double longitude = 3;
+  float percentage = 4;
 }
 
 message GetImageMap{
