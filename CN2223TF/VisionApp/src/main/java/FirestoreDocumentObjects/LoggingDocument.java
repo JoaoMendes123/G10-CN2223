@@ -8,7 +8,6 @@ public class LoggingDocument {
     public String bucket_name;
     public String blob_name;
     public List<LandmarkResult> results;
-
     public String dateOfCreation;
 
     public LoggingDocument(String requestId,

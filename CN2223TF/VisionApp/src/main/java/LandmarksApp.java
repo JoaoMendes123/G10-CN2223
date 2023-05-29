@@ -8,6 +8,8 @@ import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
 import com.google.cloud.pubsub.v1.TopicAdminClient;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.pubsub.v1.*;
 
 import java.io.IOException;
@@ -19,28 +21,34 @@ public class LandmarksApp {
     final static String PROJECT_ID = "cn2223-t1-g10";
     final static String TOPIC_ID = "cn2223tf-topic";
     final static String SUBSCRIPTION_NAME = "cn2223tf-requests";
-
     final static String COLLECTION_NAME = "cn2223tf-collection";
 
+    public static final String BUCKET_NAME = "cn2223tf_bucket";
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             System.out.println("API Key missing");
             System.out.println("Usage: java -jar LandmarkDetector.jar <API_KEY>");
             System.exit(1);
         }
-        //prepare pub/sub
-        //Landmark App creates a subscription to the topic and subscribes to it
-        //If it already exists subscribes to it
-        //Work-queue pattern
+        //Prepare Firestore
         Credentials cred = GoogleCredentials.getApplicationDefault();
         FirestoreOptions fOptions = FirestoreOptions.newBuilder().setCredentials(cred).build();
         Firestore db = fOptions.getService();
         CollectionReference colRef = db.collection(COLLECTION_NAME);
-
-
+        //Landmark App creates a subscription to the topic and subscribes to it
+        //If it already exists subscribes to it
+        //Work-queue pattern
         TopicName topic = createTopic();
         SubscriptionName sub = createSubscriptionToTopic(topic);
-        MessageMockHandler handler = new MessageMockHandler(new LandmarksDetector(args[0]), new FirestoreCalls(colRef));
+        //Prepare Storage
+        StorageOptions sOption = StorageOptions.getDefaultInstance();
+        Storage storage = sOption.getService();
+
+        MessageMockHandler handler = new MessageMockHandler(
+                new LandmarksDetector(args[0]),
+                new FirestoreCalls(colRef),
+                new StorageCalls(storage,BUCKET_NAME)
+        );
         Subscriber subscriber = createSubscriber(sub.getSubscription(), handler);
         subscriber.startAsync().awaitRunning();
         //I don't know if subscription is ever deleted, might be a problem.

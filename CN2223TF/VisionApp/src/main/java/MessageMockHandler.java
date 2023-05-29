@@ -3,6 +3,8 @@ import FirestoreDocumentObjects.LoggingDocument;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.pubsub.v1.PubsubMessage;
+import com.google.type.LatLng;
+import com.google.type.LatLngOrBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +14,13 @@ public class MessageMockHandler implements MessageReceiver {
     private final LandmarksDetector lDetector;
     private final Logger logger = Logger.getLogger(MessageMockHandler.class.getName());
     private final FirestoreCalls firestoreCalls;
+    private final StorageCalls storageCalls;
 
 
-    public MessageMockHandler(LandmarksDetector lDetector, FirestoreCalls firestoreCalls) {
+    public MessageMockHandler(LandmarksDetector lDetector, FirestoreCalls firestoreCalls, StorageCalls storageCalls) {
         this.lDetector = lDetector;
         this.firestoreCalls = firestoreCalls;
+        this.storageCalls = storageCalls;
     }
 
     @Override
@@ -34,10 +38,18 @@ public class MessageMockHandler implements MessageReceiver {
             LoggingDocument doc = new LoggingDocument(messageFields[2], messageFields[0], messageFields[1], results);
             firestoreCalls.insertDocument(doc);
             //get maps
-            //save maps in storage maps directory
-
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
+            for (LandmarkResult r: results) {
+                byte[] mapBytes = lDetector.getStaticMap(
+                        LatLng.newBuilder()
+                        .setLatitude(r.coordinates.latitude)
+                        .setLongitude(r.coordinates.longitude)
+                        .build()
+                );
+                //save maps in storage maps directory
+                if(mapBytes.length > 0)
+                    storageCalls.uploadImageToBucket(mapBytes, r.name, doc.requestId);
+            }
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         ackReplyConsumer.ack();

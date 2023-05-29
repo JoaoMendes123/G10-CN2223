@@ -8,6 +8,8 @@ public class LandmarkResult {
     public Coordinates coordinates;
     public float score;
 
+
+
     public LandmarkResult(String name, LatLng coordinates, float score){
         this.name = name;
         this.coordinates = new Coordinates(coordinates.getLatitude(), coordinates.getLongitude());

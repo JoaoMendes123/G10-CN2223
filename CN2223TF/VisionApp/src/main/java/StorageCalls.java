@@ -1,7 +1,8 @@
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -10,8 +11,7 @@ public class StorageCalls {
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
     private final String bucketName;
     private final Storage storage;
-
-    private final String IMAGES_DIRECTORY = "images/";
+    private final String MAPS_DIRECTORY = "maps/";
 
     public StorageCalls(Storage storage, String bucketName) {
         this.storage = storage;
@@ -31,23 +31,15 @@ public class StorageCalls {
                         .build());
         logger.info("created new bucket " + bucketName);
     }
-    public String[] listExistingBlobs(){
-        Bucket bucket = storage.get(bucketName);
-        ArrayList<String> res = new ArrayList<>();
-        for (Blob blob : bucket.list().iterateAll()) {
-            res.add(blob.getName());
-        }
-        return res.toArray(String[]::new);
-    }
-    public String uploadImageToBucket(byte[] content, String imageName, String type) throws Exception {
-        String generatedID = Integer.toString((int)(Math.random()*100));
-        String[] aux = imageName.split("\\.");
-        String blobName= IMAGES_DIRECTORY + aux[0] + generatedID + "." +aux[1];//ex: images/fotoname.jpg
+
+    public void uploadImageToBucket(byte[] content, String resultName,String requestID) throws Exception {
+        String blobName = MAPS_DIRECTORY + "static_map_" +
+                resultName.replaceAll(" ", "").concat("_") +
+                requestID + ".png";//ex: maps/static_map_locationname_1234.jpg
         BlobId blobId = BlobId.of(bucketName, blobName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(type).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("png").build();
 
         InputStream image = new ByteArrayInputStream(content);
-
         if (content.length > 1_000_000) {
             // When content is not available or large (1MB or more) it is recommended
             // to write it in chunks via the blob's channel writer.
@@ -68,22 +60,5 @@ public class StorageCalls {
             // create the blob in one request.
             storage.create(blobInfo, content);
         }
-        return blobName;
-    }
-
-    public void changePermissionOnBlobToPublic(String bucketName, String blobName) {
-
-        BlobId blobId = BlobId.of(bucketName, blobName);
-        Blob blob = storage.get(blobId);
-        //set blob to public
-        Acl.Entity entity = Acl.User.ofAllUsers();
-        Acl.Role role = Acl.Role.READER;
-        Acl acl = Acl.newBuilder(entity, role).build();
-        blob.createAcl(acl);
-        logger.info("Blob " + blobName + " is now public");
-    }
-
-    public String getBucketName(){
-        return bucketName;
     }
 }

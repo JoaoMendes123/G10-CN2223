@@ -2,15 +2,11 @@ import FirestoreDocumentObjects.LandmarkResult;
 import com.google.cloud.vision.v1.*;
 import com.google.type.LatLng;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 //TODO
@@ -81,37 +77,32 @@ public class LandmarksDetector {
                                     + "Landmark score: " + lResult.score + "\n"
                     );
                 }
+
                 return results;
             }
         }
         return new ArrayList<LandmarkResult>();
     }
 
-    private void getStaticMapSaveImage(LatLng latLng) {
+    public byte[] getStaticMap(LatLng latLng) {
         String mapUrl = "https://maps.googleapis.com/maps/api/staticmap?"
                 + "center=" + latLng.getLatitude() + "," + latLng.getLongitude()
                 + "&zoom=" + ZOOM
                 + "&size=" + SIZE
                 + "&key=" + API_KEY;
-        System.out.println(mapUrl);
+        logger.info(mapUrl);
         try {
             URL url = new URL(mapUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             InputStream in = conn.getInputStream();
-            BufferedInputStream bufIn = new BufferedInputStream(in);
-            FileOutputStream out = new FileOutputStream("static_map_"+ UUID.randomUUID() +".png");
-            byte[] buffer = new byte[8*1024];
-            int bytesRead;
-            while ((bytesRead = bufIn.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
-            }
-            out.close();
-            bufIn.close();
+            byte[] buffer = in.readAllBytes();
             in.close();
+            return buffer;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return new byte[0];
     }
 
 
