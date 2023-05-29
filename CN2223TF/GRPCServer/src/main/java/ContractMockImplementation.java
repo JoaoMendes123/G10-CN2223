@@ -68,6 +68,7 @@ public class ContractMockImplementation extends ContractGrpc.ContractImplBase {
                 responseObserver.onNext(res);
             }
             responseObserver.onCompleted();
+            logger.info("Completed getLandmarksFromRequest()");
         }else{
             responseObserver.onError(new Exception("Couldn't find referenced document"));
             responseObserver.onCompleted();

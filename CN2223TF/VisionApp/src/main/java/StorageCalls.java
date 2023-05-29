@@ -32,7 +32,7 @@ public class StorageCalls {
         logger.info("created new bucket " + bucketName);
     }
 
-    public void uploadImageToBucket(byte[] content, String resultName,String requestID) throws Exception {
+    public String uploadImageToBucket(byte[] content, String resultName,String requestID) throws Exception {
         String blobName = MAPS_DIRECTORY + "static_map_" +
                 resultName.replaceAll(" ", "").concat("_") +
                 requestID + ".png";//ex: maps/static_map_locationname_1234.jpg
@@ -55,10 +55,12 @@ public class StorageCalls {
                         }
                     }
                 }
+                return blobName;
             }
         } else {
             // create the blob in one request.
             storage.create(blobInfo, content);
+            return blobName;
         }
     }
 }

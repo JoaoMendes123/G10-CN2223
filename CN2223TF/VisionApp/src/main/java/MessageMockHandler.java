@@ -4,9 +4,6 @@ import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.type.LatLng;
-import com.google.type.LatLngOrBuilder;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -35,9 +32,8 @@ public class MessageMockHandler implements MessageReceiver {
 
             List<LandmarkResult> results = lDetector.detectLandmark(messageFields[0], messageFields[1]);
             //save on firestore name and localizations of identified places on the image
-            LoggingDocument doc = new LoggingDocument(messageFields[2], messageFields[0], messageFields[1], results);
-            firestoreCalls.insertDocument(doc);
             //get maps
+
             for (LandmarkResult r: results) {
                 byte[] mapBytes = lDetector.getStaticMap(
                         LatLng.newBuilder()
@@ -46,13 +42,15 @@ public class MessageMockHandler implements MessageReceiver {
                         .build()
                 );
                 //save maps in storage maps directory
-                if(mapBytes.length > 0)
-                    storageCalls.uploadImageToBucket(mapBytes, r.name, doc.requestId);
+                if(mapBytes.length > 0){
+                   r.map_blob_name = storageCalls.uploadImageToBucket(mapBytes, r.name, messageFields[2]);
+                }
             }
+            LoggingDocument doc = new LoggingDocument(messageFields[2], messageFields[0], messageFields[1], results);
+            firestoreCalls.insertDocument(doc);
+            ackReplyConsumer.ack();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        ackReplyConsumer.ack();
     }
-
 }

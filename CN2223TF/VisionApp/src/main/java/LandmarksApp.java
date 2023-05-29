@@ -75,26 +75,6 @@ public class LandmarksApp {
                 .setExecutorProvider(executorProvider)
                 .build();
     }
-
-    /**
-     *
-     * @param tName - target topic
-     * @return number of subscription on Topic provided
-     */
-    private static int getNumberOfSubscriptions(TopicName tName){
-        try(TopicAdminClient topicAdmin = TopicAdminClient.create()) {
-            int nSubscriptions = 0;
-            TopicAdminClient.ListTopicSubscriptionsPagedResponse res =
-                        topicAdmin.listTopicSubscriptions(tName);
-            for(String s : res.iterateAll()){
-                nSubscriptions++;
-            }
-            return nSubscriptions;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     /**
      * Creates a subscription with name : LandmarksApp
      * Or gets subscription if already exists
