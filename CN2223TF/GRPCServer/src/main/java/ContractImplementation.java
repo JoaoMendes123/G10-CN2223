@@ -5,18 +5,17 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class ContractMockImplementation extends ContractGrpc.ContractImplBase {
+public class ContractImplementation extends ContractGrpc.ContractImplBase {
     public static Logger logger = Logger.getLogger(Server.class.getName());
     private final StorageCalls storage;
     private final PubSubCalls pubSub;
     private final FirestoreCalls fireStore;
 
-    public ContractMockImplementation(StorageCalls storage, PubSubCalls pubSub, FirestoreCalls fireStore){
+    public ContractImplementation(StorageCalls storage, PubSubCalls pubSub, FirestoreCalls fireStore){
         this.storage = storage;
         this.pubSub = pubSub;
         this.fireStore = fireStore;
@@ -70,8 +69,12 @@ public class ContractMockImplementation extends ContractGrpc.ContractImplBase {
             responseObserver.onCompleted();
             logger.info("Completed getLandmarksFromRequest()");
         }else{
-            responseObserver.onError(new Exception("Couldn't find referenced document"));
-            responseObserver.onCompleted();
+            responseObserver.onError(
+                    io.grpc.Status
+                            .FAILED_PRECONDITION
+                            .withDescription("Couldn't find referenced document, landmarksApp has not yet processed request")
+                            .asException()
+            );
         }
     }
 }

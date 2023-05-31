@@ -1,12 +1,9 @@
-import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.pubsub.v1.Publisher;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.google.pubsub.v1.TopicName;
 import io.grpc.ServerBuilder;
 import java.io.IOException;
 import java.util.Scanner;
@@ -39,7 +36,7 @@ public class Server {
             FirestoreCalls fireStore = new FirestoreCalls(colRef);
 
             svc = ServerBuilder.forPort(SERVER_PORT)
-                    .addService(new ContractMockImplementation(storCalls, pubSubCalls, fireStore))
+                    .addService(new ContractImplementation(storCalls, pubSubCalls, fireStore))
                     .build();
             svc.start();
             System.out.println("Server is listening on port "+ SERVER_PORT);

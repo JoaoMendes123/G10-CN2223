@@ -23,7 +23,7 @@ public class ReplyObserver<T> implements StreamObserver<T> {
     public void onError(Throwable t) {
         isCompleted = true;
         logger.warning("Something went wrong getting answer from server.\n");
-        throw new RuntimeException(t);
+        System.out.println(t.getMessage());
     }
 
     @Override
