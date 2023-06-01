@@ -44,7 +44,7 @@ public class LandmarksApp {
         StorageOptions sOption = StorageOptions.getDefaultInstance();
         Storage storage = sOption.getService();
 
-        MessageMockHandler handler = new MessageMockHandler(
+        MessageHandler handler = new MessageHandler(
                 new LandmarksDetector(args[0]),
                 new FirestoreCalls(colRef),
                 new StorageCalls(storage,BUCKET_NAME)
@@ -66,7 +66,7 @@ public class LandmarksApp {
      * @param handler - handler to process new messages
      * @return - subscriber object
      */
-    private static Subscriber createSubscriber(String subName, MessageMockHandler handler) {
+    private static Subscriber createSubscriber(String subName, MessageHandler handler) {
         ProjectSubscriptionName subTo = ProjectSubscriptionName.of(PROJECT_ID, subName);
 
         ExecutorProvider executorProvider = InstantiatingExecutorProvider.newBuilder()

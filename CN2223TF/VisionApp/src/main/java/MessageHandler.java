@@ -7,14 +7,14 @@ import com.google.type.LatLng;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class MessageMockHandler implements MessageReceiver {
+public class MessageHandler implements MessageReceiver {
     private final LandmarksDetector lDetector;
-    private final Logger logger = Logger.getLogger(MessageMockHandler.class.getName());
+    private final Logger logger = Logger.getLogger(MessageHandler.class.getName());
     private final FirestoreCalls firestoreCalls;
     private final StorageCalls storageCalls;
 
 
-    public MessageMockHandler(LandmarksDetector lDetector, FirestoreCalls firestoreCalls, StorageCalls storageCalls) {
+    public MessageHandler(LandmarksDetector lDetector, FirestoreCalls firestoreCalls, StorageCalls storageCalls) {
         this.lDetector = lDetector;
         this.firestoreCalls = firestoreCalls;
         this.storageCalls = storageCalls;
@@ -46,11 +46,12 @@ public class MessageMockHandler implements MessageReceiver {
                    r.map_blob_name = storageCalls.uploadImageToBucket(mapBytes, r.name, messageFields[2]);
                 }
             }
-            LoggingDocument doc = new LoggingDocument(messageFields[2], messageFields[0], messageFields[1], results);
+            LoggingDocument doc = new LoggingDocument(messageFields[2], messageFields[0], messageFields[1],results);
             firestoreCalls.insertDocument(doc);
-            ackReplyConsumer.ack();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }finally {
+            ackReplyConsumer.ack();
         }
     }
 }

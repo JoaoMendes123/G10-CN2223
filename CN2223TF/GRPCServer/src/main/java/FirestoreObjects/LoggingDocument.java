@@ -21,4 +21,7 @@ public class LoggingDocument {
         this.results = results;
         this.dateOfCreation = LocalDateTime.now().toString();
     }
+    public LoggingDocument(){
+
+    }
 }

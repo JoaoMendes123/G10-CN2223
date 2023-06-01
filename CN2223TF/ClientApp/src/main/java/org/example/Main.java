@@ -1,11 +1,13 @@
 package org.example;
 
 import Contract.*;
+import Contract.Image;
 import Contract.Void;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -25,21 +27,13 @@ public class Main {
     private static ContractGrpc.ContractStub stub;
     private static boolean isConnected = false;
     public static void main(String[] args) {
-        while(true){
-                if(!isConnected)
-                    connectToServer();
-                else{
-                    printMenu();
-                    Scanner in = new Scanner(System.in);
-                    var pick = in.nextInt();
-                    switch (pick){
-                        case 0 : submitImage();break;
-                        case 1 : getLandmarks();break;
-                        case 99 : shutdown();break;
-                    }
-                }
+        Scanner in = new Scanner(System.in);
+        while(!isConnected){
+            connectToServer();
         }
+        printMenu(in);
     }
+
 
     /**
      * Gets running instances available and picks a random ip to connect to.
@@ -79,14 +73,26 @@ public class Main {
         }
 
     }
-    public static void printMenu(){
-        System.out.println("### Menu ###");
-        System.out.println("0 - submitImage()");
-        System.out.println("1 - getLandMarks()");
-        System.out.println("99 - exit()");
-        //TODO
+    public static void printMenu(Scanner in) {
+        while(true){
+            System.out.println("### Menu ###");
+            System.out.println("0 - submitImage()");
+            System.out.println("1 - getLandMarks()");
+            System.out.println("99 - exit()");
+            var pick = in.nextInt();
+            switch (pick) {
+                case 0:
+                    submitImage();
+                    break;
+                case 1:
+                    getLandmarks();
+                    break;
+                case 99:
+                    shutdown();
+                    return;
+            }
+        }
     }
-
     private static void shutdown(){
         try {
             channel.shutdown();
@@ -97,24 +103,35 @@ public class Main {
             logger.warning(e.getMessage());
 
         }
-        System.exit(1);
     }
 
     public static void submitImage() {
         try {
             Scanner in = new Scanner(System.in);
             System.out.println("Provide absolute path to image :");
-            if(in.hasNext()) {
+            while(in.hasNextLine()) {
                 Path p = Paths.get(in.nextLine());
-                String type = Files.probeContentType(p);
-                String name = p.getFileName().toString();
-                byte[] image = Files.readAllBytes(p);
-                executeSubmitImageRequest(image, name, type);
+                String type;
+                if(Files.exists(p)){
+                    type = Files.probeContentType(p);
+                     if( type == null || !type.equals("image/jpeg") && !type.equals("image/png") ) {
+                         System.out.println("File is not a recognized image type...");
+                     }
+                     else{
+                         String name = p.getFileName().toString();
+                         byte[] image = Files.readAllBytes(p);
+                         executeSubmitImageRequest(image, name, type);
+                         break;
+                     }
+                 }else {
+                    System.out.println("Couldn't find file");
+                }
+                System.out.println("Provide absolute path to image :");
             }
 
         } catch (IOException | InterruptedException e) {
-            logger.warning(e.getMessage());
-            throw new RuntimeException(e);
+            logger.warning("User Input : " + e.getMessage());
+
         }
 
     }

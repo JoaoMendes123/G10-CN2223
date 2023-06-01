@@ -1,6 +1,8 @@
 import Contract.*;
 import Contract.LandmarkProtoResult;
 import Contract.Void;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import io.grpc.stub.StreamObserver;
 
@@ -51,7 +53,7 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
         DocumentSnapshot doc = fireStore.getDocumentById(id);
         if(doc.exists()){
             Map<String,Object> loggedDoc = doc.getData();
-            ArrayList<Map<String, Object>> results = (ArrayList<Map<String, Object>>)loggedDoc.get("results");
+            ArrayList<Map<String, Object>> results = (ArrayList<Map<String, Object>>)loggedDoc.get("landmarkResults");
             for (Map<String, Object> idx: results) {
                 double score = (double)idx.get("score");
                 String name = (String)idx.get("name");
