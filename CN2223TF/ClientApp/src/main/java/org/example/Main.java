@@ -7,7 +7,6 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -79,7 +78,7 @@ public class Main {
             System.out.println("0 - submitImage()");
             System.out.println("1 - getLandMarks()");
             System.out.println("2 - getLandMarksWithT()");
-            System.out.println("99 - exit()");
+            System.out.println("3 - getMap()");
             var pick = in.nextInt();
             switch (pick) {
                 case 0:
@@ -91,12 +90,16 @@ public class Main {
                 case 2:
                     getLandmarksWithT();
                     break;
+                case 3:
+                    getMap();
+                    break;
                 case 99:
                     shutdown();
                     return;
             }
         }
     }
+
     private static void shutdown(){
         try {
             channel.shutdown();
@@ -210,5 +213,39 @@ public class Main {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private static void getMap() {
+        try{
+            System.out.print("Please insert the map's id: ");
+
+            Scanner in = new Scanner(System.in);
+
+            String id = in.nextLine();
+
+            //TODO change this
+            System.out.println("Please insert the idx of the result");
+
+            int idx = Integer.parseInt(in.nextLine());
+
+            ReplyObserver<GetImageMap> reply = new ReplyObserver<>();
+            MapChoice map = MapChoice.newBuilder().setId(id).setChoice(idx).build();
+
+            stub.getMap(map, reply);
+            while(!reply.isCompleted()){
+                logger.warning("waiting for server answer to complete...");
+                Thread.sleep(200);
+
+            }
+            GetImageMap imageMap = reply.getReplies().get(0);
+
+            byte[] buffer = imageMap.getMap().toByteArray();
+
+
+
+
+
+        } catch (InterruptedException e) {
+            logger.warning(e.getMessage());        }
     }
 }

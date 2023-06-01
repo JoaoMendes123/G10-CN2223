@@ -12,7 +12,6 @@ public class StorageCalls {
     private final Storage storage;
 
     private final String IMAGES_DIRECTORY = "images/";
-
     public StorageCalls(Storage storage, String bucketName) {
         this.storage = storage;
         this.bucketName = bucketName;
@@ -81,6 +80,16 @@ public class StorageCalls {
         Acl acl = Acl.newBuilder(entity, role).build();
         blob.createAcl(acl);
         logger.info("Blob " + blobName + " is now public");
+    }
+
+
+    public byte[] getMap(String blobName) {
+         Blob blob = storage.get(BlobId.of(bucketName, blobName));
+         byte[] res = blob.getContent();
+
+         logger.info("Blob acquired from " + blobName + ".");
+
+        return res;
     }
 
     public String getBucketName(){

@@ -5,6 +5,7 @@ import FirestoreObjects.LandmarkResult;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
@@ -81,4 +82,31 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
         }
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void getMap(MapChoice request, StreamObserver<GetImageMap> responseObserver) {
+
+        String id = request.getId();
+        int idx = request.getChoice();
+
+        DocumentSnapshot doc = fireStore.getDocumentById(id);
+
+        if (doc.exists()) {
+            List<LandmarkResult> res = LandmarkResult.fromSnapshot(doc);
+
+            LandmarkResult landmark = res.get(idx);
+
+            String blobName = landmark.map_blob_name;
+
+            byte[] map = storage.getMap(blobName);
+
+
+            responseObserver.onNext(GetImageMap.newBuilder().setMap(ByteString.copyFrom(map)).build());
+            responseObserver.onCompleted();
+
+            logger.info("Map download successful");
+
+        }
+    }
 }
+
