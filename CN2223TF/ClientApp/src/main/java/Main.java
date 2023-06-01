@@ -1,5 +1,3 @@
-package org.example;
-
 import Contract.*;
 import Contract.Image;
 import Contract.Void;
@@ -16,20 +14,22 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import static org.example.Utils.getRunningVMsIps;
 
 public class Main {
     private static final int SERVER_PORT = 7001;
 
+    private static boolean RUN_LOCAL = false;
     private static ManagedChannel channel;
     private static Logger logger = Logger.getLogger(Main.class.getName());
     private static ContractGrpc.ContractStub stub;
     private static boolean isConnected = false;
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-        while(!isConnected){
-            connectToServer();
+        System.out.println("Connect to localhost?\nPress [Y] to confirm");
+        if(in.hasNextLine()){
+            if(in.nextLine().equalsIgnoreCase("Y")) RUN_LOCAL = true;
         }
+        connectToServer();
         printMenu(in);
     }
 
@@ -40,15 +40,17 @@ public class Main {
     public static void connectToServer() {
         String[] ips;
         try {
-            ips = getRunningVMsIps();
+            ips = Utils.getRunningVMsIps();
             IpReply alive;
             do {
-                /**if(ips.length == 0){
-                 System.out.println("Couldn't find any instances running...");
-                 System.exit(1);
-                }*/
+                if(!RUN_LOCAL){
+                    if(ips.length == 0){
+                        System.out.println("Couldn't find any instances running...");
+                        System.exit(1);
+                    }
+                }
                 int idx = (int)(Math.random()*ips.length);
-                String pick = "localhost";
+                String pick = RUN_LOCAL ? "localhost" : ips[idx];
                 System.out.println("Connecting to " + pick);
                 channel = ManagedChannelBuilder.forAddress(pick, SERVER_PORT)
                         .usePlaintext().build();
@@ -64,7 +66,7 @@ public class Main {
                 System.out.println("Failed to connect, trying again...");
                 channel.shutdown();
                 channel.awaitTermination(100, TimeUnit.MILLISECONDS);
-                ips = getRunningVMsIps();
+                ips = Utils.getRunningVMsIps();
             }while (!alive.getAlive());
         } catch (MalformedURLException | InterruptedException | io.grpc.StatusRuntimeException e) {
             logger.warning("Check if server is on...");
@@ -163,23 +165,26 @@ public class Main {
     public static void getLandmarks(){
         try {
             Scanner in = new Scanner(System.in);
-            System.out.println("Please enter requestId:");
-            if(in.hasNext()) {
-                ImageId id = ImageId.newBuilder().setId(in.next()).build();
-                ReplyObserver<LandmarkProtoResult> reply = new ReplyObserver<>();
-                stub.getLandmarksFromRequest(id,reply);
-                while(!reply.isCompleted()){
-                    logger.warning("waiting for server answer to complete...");
-                    Thread.sleep(200);
+            ReplyObserver<LandmarkProtoResult> reply = new ReplyObserver<>();
+            while(!reply.isSuccess()) {
+                System.out.println("Please enter requestId:");
+                if(in.hasNext()){
+                    ImageId id = ImageId.newBuilder().setId(in.next()).build();
+                    stub.getLandmarksFromRequest(id,reply);
+                    while(!reply.isCompleted()){
+                        logger.warning("waiting for server answer to complete...");
+                        Thread.sleep(200);
+                    }
                 }
-                for (LandmarkProtoResult res: reply.getReplies()) {
-                    System.out.format("Landmark Name: %s\n Coordinates: \n\tLatitude =%,.10f\n\tLongitude =%,.10f\nscore:%,.10f\n",
-                            res.getName(),
-                            res.getLatitude(),
-                            res.getLongitude(),
-                            res.getPercentage()
-                            );
-                }
+                if(!reply.isSuccess()) reply = new ReplyObserver<>();
+            }
+            for (LandmarkProtoResult res: reply.getReplies()) {
+                System.out.format("Landmark Name: %s\nCoordinates: \n\t\tLatitude =%,.10f\n\t\tLongitude =%,.10f\nscore:%,.10f\n",
+                    res.getName(),
+                    res.getLatitude(),
+                    res.getLongitude(),
+                    res.getPercentage()
+                );
             }
         } catch (InterruptedException e) {
             logger.warning(e.getMessage());
@@ -191,22 +196,30 @@ public class Main {
     public static void getLandmarksWithT(){
         try {
             Scanner in = new Scanner(System.in);
-            if(in.hasNextDouble()) {
-                ReplyObserver<LandmarkProtoResult> reply = new ReplyObserver<>();
-                GetImageNamesWithTRequest t = GetImageNamesWithTRequest.newBuilder().setT(in.nextDouble()).build();
-                stub.getNamesFromTImage(t, reply);
-                while(!reply.isCompleted()){
-                    logger.warning("waiting for server answer to complete...");
-                    Thread.sleep(200);
+            ReplyObserver<LandmarkProtoResult> reply = new ReplyObserver<>();
+            while(!reply.isSuccess()) {
+                System.out.println("Enter minimum score");
+                if(in.hasNextDouble()){
+                    GetImageNamesWithTRequest t = GetImageNamesWithTRequest.newBuilder().setT(in.nextDouble()).build();
+                    stub.getNamesFromTImage(t, reply);
+                    while(!reply.isCompleted()){
+                        logger.warning("waiting for server answer to complete...");
+                        Thread.sleep(200);
+                    }
                 }
-                for (LandmarkProtoResult res: reply.getReplies()) {
-                    System.out.format("Landmark Name: %s\n Coordinates: \n\tLatitude =%,.10f\n\tLongitude =%,.10f\nscore:%,.10f\n",
-                            res.getName(),
-                            res.getLatitude(),
-                            res.getLongitude(),
-                            res.getPercentage()
-                    );
-                }
+                if(!reply.isSuccess()) reply = new ReplyObserver<>();
+            }
+            var results = reply.getReplies();
+            if(results.isEmpty()){
+                System.out.println("No documents found for that condition");
+            }
+            for (LandmarkProtoResult res: results) {
+                System.out.format("Landmark Name: %s\nCoordinates:\n\t\tLatitude =%,.10f\n\t\tLongitude =%,.10f\nscore:%,.10f\n",
+                    res.getName(),
+                    res.getLatitude(),
+                    res.getLongitude(),
+                    res.getPercentage()
+                );
             }
         } catch (InterruptedException e) {
             logger.warning(e.getMessage());
@@ -246,6 +259,7 @@ public class Main {
 
 
         } catch (InterruptedException e) {
-            logger.warning(e.getMessage());        }
+            logger.warning(e.getMessage());
+        }
     }
 }
