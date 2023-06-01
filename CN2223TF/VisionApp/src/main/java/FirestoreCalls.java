@@ -24,6 +24,11 @@ public class FirestoreCalls {
             DocumentReference docRef = COLLECTION_REFERENCE.document(docName);
             //create collection results in document
             //Required to update the Firestore db, if future is not consulted, no effects are taken in the db
+            CollectionReference resultsCol = docRef.collection("results");
+            for (LandmarkResult lres: doc.getResults()) {
+                 DocumentReference resultRef = resultsCol.document(lres.name);
+                 resultRef.create(lres);
+            }
             ApiFuture<WriteResult> resFut = docRef.create(doc);
             WriteResult result = resFut.get();
             logger.info("Document created with name: " + docName);

@@ -13,7 +13,7 @@ service Contract {
   rpc submitImage(Image) returns (stream ImageId);
   rpc getLandmarksFromRequest(ImageId) returns (stream LandmarkProtoResult);
   rpc getMap(MapChoice) returns (GetImageMap);
-  rpc getNamesFromTImage(GetImageNamesWithTRequest) returns (stream GetImageNamesWithTResponse);
+  rpc getNamesFromTImage(GetImageNamesWithTRequest) returns (stream LandmarkProtoResult);
 }
 
 message Void {
@@ -65,8 +65,4 @@ message GetImageMap{
   bytes map = 1;
 }
 
-message GetImageNamesWithTResponse{
-  string name = 1;
-  string local = 2;
-}
 

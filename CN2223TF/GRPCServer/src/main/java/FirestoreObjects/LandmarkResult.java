@@ -25,6 +25,8 @@ public class LandmarkResult {
         this.score = score;
     }
 
+    public LandmarkResult(){}
+
 
     public static List<LandmarkResult> fromSnapshot(DocumentSnapshot doc){
         Map<String,Object> loggedDoc = doc.getData();

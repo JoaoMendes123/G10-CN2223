@@ -78,6 +78,7 @@ public class Main {
             System.out.println("### Menu ###");
             System.out.println("0 - submitImage()");
             System.out.println("1 - getLandMarks()");
+            System.out.println("2 - getLandMarksWithT()");
             System.out.println("99 - exit()");
             var pick = in.nextInt();
             switch (pick) {
@@ -86,6 +87,9 @@ public class Main {
                     break;
                 case 1:
                     getLandmarks();
+                    break;
+                case 2:
+                    getLandmarksWithT();
                     break;
                 case 99:
                     shutdown();
@@ -172,6 +176,33 @@ public class Main {
                             res.getLongitude(),
                             res.getPercentage()
                             );
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.warning(e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static void getLandmarksWithT(){
+        try {
+            Scanner in = new Scanner(System.in);
+            if(in.hasNextDouble()) {
+                ReplyObserver<LandmarkProtoResult> reply = new ReplyObserver<>();
+                GetImageNamesWithTRequest t = GetImageNamesWithTRequest.newBuilder().setT(in.nextDouble()).build();
+                stub.getNamesFromTImage(t, reply);
+                while(!reply.isCompleted()){
+                    logger.warning("waiting for server answer to complete...");
+                    Thread.sleep(200);
+                }
+                for (LandmarkProtoResult res: reply.getReplies()) {
+                    System.out.format("Landmark Name: %s\n Coordinates: \n\tLatitude =%,.10f\n\tLongitude =%,.10f\nscore:%,.10f\n",
+                            res.getName(),
+                            res.getLatitude(),
+                            res.getLongitude(),
+                            res.getPercentage()
+                    );
                 }
             }
         } catch (InterruptedException e) {

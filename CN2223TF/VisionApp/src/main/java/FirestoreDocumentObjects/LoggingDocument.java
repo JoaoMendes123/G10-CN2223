@@ -21,4 +21,7 @@ public class LoggingDocument {
         this.results = results;
     }
 
+    public List<LandmarkResult> getResults() {
+        return results;
+    }
 }

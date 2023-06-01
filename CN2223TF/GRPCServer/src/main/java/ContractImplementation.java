@@ -53,8 +53,9 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
     public void getLandmarksFromRequest(ImageId request, StreamObserver<LandmarkProtoResult> responseObserver) {
         String id = request.getId();
         DocumentSnapshot doc = fireStore.getDocumentById(id);
+
         if(doc.exists()){
-            List<LandmarkResult> res = LandmarkResult.fromSnapshot(doc);
+            List<LandmarkResult> res = fireStore.getLandmarkResultsFromRequest(id);
             res.forEach(landmarkResult -> {
                 responseObserver.onNext(LandmarkResult.toProtoObject(landmarkResult));
             });
@@ -70,5 +71,14 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
         }
     }
 
-
+    @Override
+    public void getNamesFromTImage(GetImageNamesWithTRequest request, StreamObserver<LandmarkProtoResult> responseObserver) {
+        double t = request.getT();
+        List<LandmarkResult> results = fireStore.getLandmarkResultsWithT(t);
+        for (LandmarkResult res: results) {
+            logger.info("gettingImagesWithT: " + res.map_blob_name);
+            responseObserver.onNext(LandmarkResult.toProtoObject(res));
+        }
+        responseObserver.onCompleted();
+    }
 }
