@@ -1,4 +1,4 @@
-package FirestoreDocumentObjects;
+package DocumentObjects;
 
 public class Coordinates {
     public double latitude;

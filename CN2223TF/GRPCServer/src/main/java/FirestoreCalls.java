@@ -1,11 +1,8 @@
 import FirestoreObjects.LandmarkResult;
 import FirestoreObjects.LoggingDocument;
-import com.google.api.Logging;
 import com.google.api.core.ApiFuture;
-import com.google.api.services.storage.Storage;
 import com.google.cloud.firestore.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -19,19 +16,26 @@ public class FirestoreCalls {
         this.colRef = colRef;
     }
 
-    public DocumentSnapshot getDocumentById(String docId){
+    public DocumentReference getDocumentReference(String docId){
+        return colRef.document(docId);
+
+    }
+
+    public LoggingDocument getLoggingDocumentByReference(DocumentReference doc){
 
         try {
-            ApiFuture<DocumentSnapshot> fut = colRef.document(docId).get();
-            return fut.get();
+            LoggingDocument logDoc = doc.get().get().toObject(LoggingDocument.class);
+            if(logDoc != null){
+                logDoc.results = getLandmarkResultsFromReference(doc);
+            }
+            return logDoc;
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<LandmarkResult> getLandmarkResultsFromRequest(String id){
+    public List<LandmarkResult> getLandmarkResultsFromReference(DocumentReference doc){
         ArrayList<LandmarkResult> list = new ArrayList<>();
-        DocumentReference doc = colRef.document(id);
         CollectionReference resultsCollection = doc.collection("results");
         resultsCollection.listDocuments().forEach(resultDoc ->{
             ApiFuture<DocumentSnapshot> snapshot = resultDoc.get();
@@ -48,8 +52,9 @@ public class FirestoreCalls {
 
 
     /**
-     * TODO
-     * @param
+     * Goes through every request and checks which ones have results with score > t
+     * @param t - minimum score
+     * @return list of results with > t
      */
     public List<LandmarkResult> getLandmarkResultsWithT(double t){
         ArrayList<LandmarkResult> results = new ArrayList<>();

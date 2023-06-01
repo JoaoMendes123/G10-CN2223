@@ -1,8 +1,12 @@
-package FirestoreDocumentObjects;
+package DocumentObjects;
+import com.google.cloud.firestore.annotation.Exclude;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class LoggingDocument {
+
+    @Exclude
     public final List<LandmarkResult> results;
     public String requestId;
     public String bucket_name;
@@ -21,7 +25,4 @@ public class LoggingDocument {
         this.results = results;
     }
 
-    public List<LandmarkResult> getResults() {
-        return results;
-    }
 }

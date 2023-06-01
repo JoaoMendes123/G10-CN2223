@@ -1,4 +1,4 @@
-import FirestoreDocumentObjects.LandmarkResult;
+import DocumentObjects.LandmarkResult;
 import com.google.cloud.vision.v1.*;
 import com.google.type.LatLng;
 

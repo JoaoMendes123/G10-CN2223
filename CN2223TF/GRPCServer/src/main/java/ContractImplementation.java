@@ -2,16 +2,16 @@ import Contract.*;
 import Contract.LandmarkProtoResult;
 import Contract.Void;
 import FirestoreObjects.LandmarkResult;
-import com.google.cloud.firestore.CollectionReference;
+import FirestoreObjects.LoggingDocument;
+import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.protobuf.ByteString;
 import io.grpc.stub.StreamObserver;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 public class ContractImplementation extends ContractGrpc.ContractImplBase {
@@ -53,22 +53,26 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
     @Override
     public void getLandmarksFromRequest(ImageId request, StreamObserver<LandmarkProtoResult> responseObserver) {
         String id = request.getId();
-        DocumentSnapshot doc = fireStore.getDocumentById(id);
-
-        if(doc.exists()){
-            List<LandmarkResult> res = fireStore.getLandmarkResultsFromRequest(id);
-            res.forEach(landmarkResult -> {
-                responseObserver.onNext(LandmarkResult.toProtoObject(landmarkResult));
-            });
-            responseObserver.onCompleted();
-            logger.info("Completed getLandmarksFromRequest()");
-        }else{
-            responseObserver.onError(
-                    io.grpc.Status
-                            .FAILED_PRECONDITION
-                            .withDescription("Couldn't find referenced document, landmarksApp has not yet processed request")
-                            .asException()
-            );
+        ApiFuture<DocumentSnapshot> doc = fireStore.getDocumentReference(id).get();
+        DocumentReference ref = fireStore.getDocumentReference(id);
+        try {
+            if(doc.get().exists()){
+                List<LandmarkResult> res = fireStore.getLandmarkResultsFromReference(ref);
+                res.forEach(landmarkResult -> {
+                    responseObserver.onNext(LandmarkResult.toProtoObject(landmarkResult));
+                });
+                responseObserver.onCompleted();
+                logger.info("Completed getLandmarksFromRequest()");
+            }else{
+                responseObserver.onError(
+                        io.grpc.Status
+                                .FAILED_PRECONDITION
+                                .withDescription("Couldn't find referenced document, landmarksApp has not yet processed request")
+                                .asException()
+                );
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -89,24 +93,27 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
         String id = request.getId();
         int idx = request.getChoice();
 
-        DocumentSnapshot doc = fireStore.getDocumentById(id);
+        DocumentReference doc = fireStore.getDocumentReference(id);
+        ApiFuture<DocumentSnapshot> fut = doc.get();
+        try {
+            DocumentSnapshot snapshot = fut.get();
+            if (snapshot.exists()) {
+                LoggingDocument logObj = fireStore.getLoggingDocumentByReference(doc);
+                String blobName = logObj.results.get(idx).map_blob_name;
 
-        if (doc.exists()) {
-            List<LandmarkResult> res = LandmarkResult.fromSnapshot(doc);
-
-            LandmarkResult landmark = res.get(idx);
-
-            String blobName = landmark.map_blob_name;
-
-            byte[] map = storage.getMap(blobName);
+                byte[] map = storage.getMap(blobName);
 
 
-            responseObserver.onNext(GetImageMap.newBuilder().setMap(ByteString.copyFrom(map)).build());
-            responseObserver.onCompleted();
+                responseObserver.onNext(GetImageMap.newBuilder().setMap(ByteString.copyFrom(map)).build());
+                responseObserver.onCompleted();
 
-            logger.info("Map download successful");
+                logger.info("Map download successful");
 
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
         }
+
     }
 }
 

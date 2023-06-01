@@ -1,11 +1,10 @@
-import FirestoreDocumentObjects.LandmarkResult;
-import FirestoreDocumentObjects.LoggingDocument;
+import DocumentObjects.LandmarkResult;
+import DocumentObjects.LoggingDocument;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.WriteResult;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
@@ -25,7 +24,7 @@ public class FirestoreCalls {
             //create collection results in document
             //Required to update the Firestore db, if future is not consulted, no effects are taken in the db
             CollectionReference resultsCol = docRef.collection("results");
-            for (LandmarkResult lres: doc.getResults()) {
+            for (LandmarkResult lres: doc.results) {
                  DocumentReference resultRef = resultsCol.document(lres.name);
                  resultRef.create(lres);
             }

@@ -2,6 +2,7 @@ package FirestoreObjects;
 
 import Contract.LandmarkProtoResult;
 import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.annotation.Exclude;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,5 +1,5 @@
-import FirestoreDocumentObjects.LandmarkResult;
-import FirestoreDocumentObjects.LoggingDocument;
+import DocumentObjects.LandmarkResult;
+import DocumentObjects.LoggingDocument;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.pubsub.v1.PubsubMessage;

@@ -1,9 +1,7 @@
-package FirestoreDocumentObjects;
+package DocumentObjects;
 
 
 import com.google.type.LatLng;
-
-import java.util.Map;
 
 public class LandmarkResult {
     public String name;
