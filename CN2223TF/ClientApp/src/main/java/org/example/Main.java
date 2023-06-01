@@ -7,6 +7,9 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -224,7 +227,7 @@ public class Main {
             String id = in.nextLine();
 
             //TODO change this
-            System.out.println("Please insert the idx of the result");
+            System.out.print("Please insert the idx of the result: ");
 
             int idx = Integer.parseInt(in.nextLine());
 
@@ -241,11 +244,21 @@ public class Main {
 
             byte[] buffer = imageMap.getMap().toByteArray();
 
+            //TODO create different names
+            File test = new File("C:\\Users\\Utilizador\\OneDrive\\Ambiente de Trabalho\\gitCN\\G10-CN2223\\CN2223TF\\ClientApp\\src\\main\\java\\org\\example\\CNDownloads\\" +
+                    "image.png");
+            FileOutputStream fout=new FileOutputStream(test);
+            fout.write(buffer);
 
 
 
 
         } catch (InterruptedException e) {
-            logger.warning(e.getMessage());        }
+            logger.warning(e.getMessage());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
