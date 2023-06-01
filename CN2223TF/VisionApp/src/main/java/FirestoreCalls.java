@@ -33,15 +33,4 @@ public class FirestoreCalls {
 
         }
     }
-
-    private void writeLandmarkResult(LandmarkResult landmarkResult, CollectionReference path) {
-        try {
-            String resultName = landmarkResult.name.replaceAll(" ", "");
-            DocumentReference resultReference = path.document(resultName);
-            ApiFuture<WriteResult> fut = resultReference.create(landmarkResult);
-            logger.info("create document for result in : " + fut.get().getUpdateTime());
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

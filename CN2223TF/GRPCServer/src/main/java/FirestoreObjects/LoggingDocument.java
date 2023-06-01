@@ -1,7 +1,12 @@
 package FirestoreObjects;
 
+import Contract.LandmarkProtoResult;
+import com.google.cloud.firestore.DocumentSnapshot;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class LoggingDocument {
     public String requestId;
@@ -21,7 +26,11 @@ public class LoggingDocument {
         this.results = results;
         this.dateOfCreation = LocalDateTime.now().toString();
     }
+
+
     public LoggingDocument(){
 
     }
+
+
 }

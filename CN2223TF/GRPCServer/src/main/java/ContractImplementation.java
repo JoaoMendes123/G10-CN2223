@@ -1,12 +1,14 @@
 import Contract.*;
 import Contract.LandmarkProtoResult;
 import Contract.Void;
+import FirestoreObjects.LandmarkResult;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -52,22 +54,10 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
         String id = request.getId();
         DocumentSnapshot doc = fireStore.getDocumentById(id);
         if(doc.exists()){
-            Map<String,Object> loggedDoc = doc.getData();
-            ArrayList<Map<String, Object>> results = (ArrayList<Map<String, Object>>)loggedDoc.get("landmarkResults");
-            for (Map<String, Object> idx: results) {
-                double score = (double)idx.get("score");
-                String name = (String)idx.get("name");
-                Map<String, Object> coordinates = (Map<String, Object>)idx.get("coordinates");
-                double latitude = (double)coordinates.get("latitude");
-                double longitude = (double)coordinates.get("longitude");
-                LandmarkProtoResult res =  LandmarkProtoResult.newBuilder()
-                        .setLatitude(latitude)
-                        .setLongitude(longitude)
-                        .setPercentage((float)score)
-                        .setName(name)
-                        .build();
-                responseObserver.onNext(res);
-            }
+            List<LandmarkResult> res = LandmarkResult.fromSnapshot(doc);
+            res.forEach(landmarkResult -> {
+                responseObserver.onNext(LandmarkResult.toProtoObject(landmarkResult));
+            });
             responseObserver.onCompleted();
             logger.info("Completed getLandmarksFromRequest()");
         }else{
@@ -79,4 +69,6 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
             );
         }
     }
+
+
 }
