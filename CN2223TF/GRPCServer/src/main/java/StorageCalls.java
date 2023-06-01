@@ -87,7 +87,7 @@ public class StorageCalls {
          Blob blob = storage.get(BlobId.of(bucketName, blobName));
          byte[] res = blob.getContent();
 
-         logger.info("Blob acquired from " + blobName + ".");
+         logger.info("Blob acquired from " + blob.getName() + ".");
 
         return res;
     }
