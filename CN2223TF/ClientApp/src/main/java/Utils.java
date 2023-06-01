@@ -1,28 +1,15 @@
-package org.example;
-
-import Contract.Image;
-import Contract.ImageId;
 import com.google.gson.Gson;
-import com.google.protobuf.ByteString;
-
-import javax.imageio.ImageIO;
-import java.awt.image.DataBufferByte;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 public class Utils {
     private static final String cFunctionURL = "https://europe-west1-cn2223-t1-g10.cloudfunctions.net/getRunningVms";
     public static String[] getRunningVMsIps() throws MalformedURLException {
         URL cFunction = new URL(cFunctionURL);
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
         try {
             HttpURLConnection con = (HttpURLConnection) cFunction.openConnection();
             con.setRequestMethod("GET");

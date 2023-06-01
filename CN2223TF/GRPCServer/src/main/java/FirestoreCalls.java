@@ -16,11 +16,22 @@ public class FirestoreCalls {
         this.colRef = colRef;
     }
 
+
+    /**
+     * Gets DocumentReference of Document with docId.
+     * @param docId - requestID.
+     */
     public DocumentReference getDocumentReference(String docId){
         return colRef.document(docId);
 
     }
 
+
+    /**
+     * Gets complete LoggingDocument from docReference.
+     * @param doc - DocumentReference to request.
+     * @return Complete LoggingDocument.
+     */
     public LoggingDocument getLoggingDocumentByReference(DocumentReference doc){
 
         try {
@@ -34,6 +45,10 @@ public class FirestoreCalls {
         }
     }
 
+    /**
+     * @param doc - DocumenteReference to request.
+     * @return list of LandmarkResult from a specific request.
+     */
     public List<LandmarkResult> getLandmarkResultsFromReference(DocumentReference doc){
         ArrayList<LandmarkResult> list = new ArrayList<>();
         CollectionReference resultsCollection = doc.collection("results");
@@ -68,22 +83,10 @@ public class FirestoreCalls {
                 resultsWithT.forEach(result -> {
                     results.add(result.toObject(LandmarkResult.class));
                 });
-
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
         });
         return results;
-        /**
-        try {
-            ApiFuture<DocumentSnapshot> docSnap = colRef.where()
-            DocumentSnapshot doc = docSnap.get();
-            LoggingDocument l = doc.toObject(LoggingDocument.class);
-            logger.info("test log : " + l.blob_name);
-            logger.info("test log : " + l.results.get(0).name);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }*/
-
     }
 }
