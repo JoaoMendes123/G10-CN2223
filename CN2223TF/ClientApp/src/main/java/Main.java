@@ -285,10 +285,14 @@ public class Main {
                 byte[] buffer = imageMap.getMap().toByteArray();
                 String name = "static-map-" + id + "-"+idx+".png";
                 Path target = DOWNLOAD_PATH.resolve(name);
-                Path test = Files.createFile(target);
-                try(FileOutputStream fout=new FileOutputStream(test.toFile());){
-                    fout.write(buffer);
+                if(!target.toFile().exists()){
+                    Path test = Files.createFile(target);
+                    try(FileOutputStream fout=new FileOutputStream(test.toFile());){
+                        fout.write(buffer);
+                        fout.flush();
+                    }
                 }
+                System.out.println("Downloaded file to: " + target.getFileName());
             }
         } catch (InterruptedException e) {
             logger.warning(e.getMessage());
