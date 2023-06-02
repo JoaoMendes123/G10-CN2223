@@ -7,6 +7,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.protobuf.ByteString;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.List;
@@ -94,26 +95,17 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
         int idx = request.getChoice();
 
         DocumentReference doc = fireStore.getDocumentReference(id);
-        ApiFuture<DocumentSnapshot> fut = doc.get();
-        try {
-            DocumentSnapshot snapshot = fut.get();
-            if (snapshot.exists()) {
-                LoggingDocument logObj = fireStore.getLoggingDocumentByReference(doc);
-                String blobName = logObj.results.get(idx).map_blob_name;
-
-                byte[] map = storage.getMap(blobName);
-
-
-                responseObserver.onNext(GetImageMap.newBuilder().setMap(ByteString.copyFrom(map)).build());
-                responseObserver.onCompleted();
-
-                logger.info("Map download successful");
-
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        LoggingDocument logObj = fireStore.getLoggingDocumentByReference(doc);
+        if(logObj.results.size() > idx){
+            String blobName = logObj.results.get(idx).map_blob_name;
+            byte[] map = storage.getMap(blobName);
+            responseObserver.onNext(GetImageMap.newBuilder().setMap(ByteString.copyFrom(map)).build());
+            responseObserver.onCompleted();
+            logger.info("Map download successful");
+        }else{
+            logger.warning("idx > number of results");
+            responseObserver.onError(Status.OUT_OF_RANGE.asException());
         }
-
     }
 }
 

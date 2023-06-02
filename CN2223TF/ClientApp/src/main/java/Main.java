@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 
 public class Main {
+    private static Path DOWNLOAD_PATH = Path.of("./maps/");
     private static final int SERVER_PORT = 7001;
 
     private static ManagedChannel channel;
@@ -28,7 +29,9 @@ public class Main {
     private static Boolean RUN_LOCAL = false;
     private static Boolean PICK_RANDOM_IP = true;
     private static boolean isConnected = false;
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        if(!Files.exists(DOWNLOAD_PATH))
+            Files.createDirectories(DOWNLOAD_PATH);
         Scanner in = new Scanner(System.in);
         System.out.println("Connect to localhost? [y/Y]");
         if(in.hasNextLine()){
@@ -199,8 +202,10 @@ public class Main {
                     logger.warning("waiting for server answer to complete...");
                     Thread.sleep(200);
                 }
+                int idx = 0;
                 for (LandmarkProtoResult res: reply.getReplies()) {
-                    System.out.format("Landmark Name: %s\n Coordinates: \n\tLatitude =%,.10f\n\tLongitude =%,.10f\nscore:%,.10f\n",
+                    System.out.format("%d\n\tLandmark Name: %s\n\tCoordinates: \n\t\tLatitude =%,.10f\n\t\tLongitude =%,.10f\n\tscore:%,.10f\n",
+                            idx++,
                             res.getName(),
                             res.getLatitude(),
                             res.getLongitude(),
@@ -227,7 +232,7 @@ public class Main {
                     Thread.sleep(200);
                 }
                 for (LandmarkProtoResult res: reply.getReplies()) {
-                    System.out.format("Landmark Name: %s\n Coordinates: \n\tLatitude =%,.10f\n\tLongitude =%,.10f\nscore:%,.10f\n",
+                    System.out.format("\n\tLandmark Name: %s\n\tCoordinates: \n\t\tLatitude =%,.10f\n\t\tLongitude =%,.10f\n\tscore:%,.10f\n",
                             res.getName(),
                             res.getLatitude(),
                             res.getLongitude(),
@@ -244,39 +249,49 @@ public class Main {
 
     private static void getMap() {
         try{
-            System.out.print("Please insert the map's id: ");
-
             Scanner in = new Scanner(System.in);
+            System.out.print("Please insert request id: ");
 
-            String id = in.nextLine();
-
-            //TODO change this
-            System.out.print("Please insert the idx of the result: ");
-
-            int idx = Integer.parseInt(in.nextLine());
-
-            ReplyObserver<GetImageMap> reply = new ReplyObserver<>();
-            MapChoice map = MapChoice.newBuilder().setId(id).setChoice(idx).build();
-
-            stub.getMap(map, reply);
-            while(!reply.isCompleted()){
-                logger.warning("waiting for server answer to complete...");
-                Thread.sleep(200);
-
+            if(in.hasNext()){
+                String id = in.next();
+                ReplyObserver reply = new ReplyObserver<LandmarkProtoResult>();
+                ImageId reqId = ImageId.newBuilder().setId(id).build();
+                stub.getLandmarksFromRequest(reqId, reply);
+                System.out.print("Please insert the idx of the result:[0..N]");
+                int idx;
+                if(in.hasNextInt()){
+                    idx = in.nextInt();
+                }else{
+                    System.out.println("Has to be a Number!");
+                    return;
+                }
+                while (!reply.isCompleted()){
+                    logger.warning("waiting for server answer to complete");
+                    Thread.sleep(300);
+                }
+                if(reply.getReplies().size() <= idx){
+                    System.out.println("Number of results: " + reply.getReplies().size());
+                    System.out.println("Your input: " + idx);
+                    return;
+                }
+                reply = new ReplyObserver<GetImageMap>();
+                MapChoice map = MapChoice.newBuilder().setId(id).setChoice(idx).build();
+                stub.getMap(map, reply);
+                while(!reply.isCompleted()){
+                    logger.warning("waiting for server answer to complete...");
+                    Thread.sleep(200);
+                }
+                GetImageMap imageMap = (GetImageMap) reply.getReplies().get(0);
+                byte[] buffer = imageMap.getMap().toByteArray();
+                String name = "static-map-" + id + "-"+idx+".png";
+                Path target = DOWNLOAD_PATH.resolve(name);
+                Path test = Files.createFile(target);
+                try(FileOutputStream fout=new FileOutputStream(test.toFile());){
+                    fout.write(buffer);
+                }
             }
-            GetImageMap imageMap = reply.getReplies().get(0);
-
-            byte[] buffer = imageMap.getMap().toByteArray();
-
-            //TODO create different names
-            File test = new File("./maps");
-            FileOutputStream fout=new FileOutputStream(test);
-            fout.write(buffer);
-
         } catch (InterruptedException e) {
             logger.warning(e.getMessage());
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

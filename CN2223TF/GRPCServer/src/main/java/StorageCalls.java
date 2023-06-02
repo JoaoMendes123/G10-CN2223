@@ -84,12 +84,15 @@ public class StorageCalls {
 
 
     public byte[] getMap(String blobName) {
-         Blob blob = storage.get(BlobId.of(bucketName, blobName));
-         byte[] res = blob.getContent();
 
-         logger.info("Blob acquired from " + blob.getName() + ".");
-
-        return res;
+        logger.info("Getting :" +blobName);
+        String blobGsPath = "gs://"+bucketName+"/" + blobName;
+        logger.info("Getting : " + blobGsPath);
+        BlobId blobId = BlobId.fromGsUtilUri(blobGsPath);
+        byte[] blob = storage.readAllBytes(blobId);
+        //logger.info("Blob acquired from " + blob.getName() + ".");
+         //byte[] res = blob.getContent();;
+        return blob;
     }
 
     public String getBucketName(){
