@@ -1,5 +1,3 @@
-package org.example;
-
 import Contract.*;
 import Contract.Image;
 import Contract.Void;
@@ -19,7 +17,6 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import static org.example.Utils.getRunningVMsIps;
 
 public class Main {
     private static final int SERVER_PORT = 7001;
@@ -27,12 +24,24 @@ public class Main {
     private static ManagedChannel channel;
     private static Logger logger = Logger.getLogger(Main.class.getName());
     private static ContractGrpc.ContractStub stub;
+
+    private static Boolean RUN_LOCAL = false;
+    private static Boolean PICK_RANDOM_IP = true;
     private static boolean isConnected = false;
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
+        System.out.println("Connect to localhost? [y/Y]");
+        if(in.hasNextLine()){
+            if(in.nextLine().equalsIgnoreCase("y")) RUN_LOCAL=true;
+        }
+        if(!RUN_LOCAL){
+            System.out.println("Select a specific server?[y/Y]");
+            if(in.hasNextLine() && in.nextLine().equalsIgnoreCase("y")) PICK_RANDOM_IP= false;
+        }
         while(!isConnected){
             connectToServer();
         }
+
         printMenu(in);
     }
 
@@ -43,15 +52,29 @@ public class Main {
     public static void connectToServer() {
         String[] ips;
         try {
-            ips = getRunningVMsIps();
+            ips = Utils.getRunningVMsIps();
             IpReply alive;
             do {
-                /**if(ips.length == 0){
-                 System.out.println("Couldn't find any instances running...");
-                 System.exit(1);
-                }*/
-                int idx = (int)(Math.random()*ips.length);
                 String pick = "localhost";
+                if(!RUN_LOCAL){
+                    if(ips.length == 0){
+                        System.out.println("Couldn't find any instances running...");
+                        System.exit(1);
+                    }
+                    int idx =  (int)(Math.random()*ips.length);
+                    if(!PICK_RANDOM_IP){
+                        System.out.println("Server Available:");
+                        for (int i = 0; i < ips.length; i++){
+                            System.out.format("\t%d - %s\n", i, ips[i]);
+                        }
+                        System.out.println("Select Server: [0..N]");
+                        Scanner in = new Scanner(System.in);
+                        if(in.hasNextInt()) {
+                            idx = in.nextInt();
+                        }
+                    }
+                    pick = ips[idx];
+                }
                 System.out.println("Connecting to " + pick);
                 channel = ManagedChannelBuilder.forAddress(pick, SERVER_PORT)
                         .usePlaintext().build();
@@ -67,7 +90,7 @@ public class Main {
                 System.out.println("Failed to connect, trying again...");
                 channel.shutdown();
                 channel.awaitTermination(100, TimeUnit.MILLISECONDS);
-                ips = getRunningVMsIps();
+                ips = Utils.getRunningVMsIps();
             }while (!alive.getAlive());
         } catch (MalformedURLException | InterruptedException | io.grpc.StatusRuntimeException e) {
             logger.warning("Check if server is on...");
@@ -82,6 +105,7 @@ public class Main {
             System.out.println("1 - getLandMarks()");
             System.out.println("2 - getLandMarksWithT()");
             System.out.println("3 - getMap()");
+            System.out.println("99 - exit");
             var pick = in.nextInt();
             switch (pick) {
                 case 0:
@@ -245,13 +269,9 @@ public class Main {
             byte[] buffer = imageMap.getMap().toByteArray();
 
             //TODO create different names
-            File test = new File("C:\\Users\\Utilizador\\OneDrive\\Ambiente de Trabalho\\gitCN\\G10-CN2223\\CN2223TF\\ClientApp\\src\\main\\java\\org\\example\\CNDownloads\\" +
-                    "image.png");
+            File test = new File("./maps");
             FileOutputStream fout=new FileOutputStream(test);
             fout.write(buffer);
-
-
-
 
         } catch (InterruptedException e) {
             logger.warning(e.getMessage());
