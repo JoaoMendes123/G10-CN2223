@@ -5,8 +5,6 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,6 +17,7 @@ import java.util.logging.Logger;
 
 
 public class Main {
+
     private static Path DOWNLOAD_PATH = Path.of("./maps/");
     private static final int SERVER_PORT = 7001;
 
@@ -112,16 +111,16 @@ public class Main {
             var pick = in.nextInt();
             switch (pick) {
                 case 0:
-                    submitImage();
+                    submitImage(in);
                     break;
                 case 1:
-                    getLandmarks();
+                    getLandmarks(in);
                     break;
                 case 2:
-                    getLandmarksWithT();
+                    getLandmarksWithT(in);
                     break;
                 case 3:
-                    getMap();
+                    getMap(in);
                     break;
                 case 99:
                     shutdown();
@@ -142,11 +141,10 @@ public class Main {
         }
     }
 
-    public static void submitImage() {
+    public static void submitImage(Scanner in) {
         try {
-            Scanner in = new Scanner(System.in);
             System.out.println("Provide absolute path to image :");
-            while(in.hasNextLine()) {
+            while(in.hasNext()) {
                 Path p = Paths.get(in.nextLine());
                 String type;
                 if(Files.exists(p)){
@@ -190,9 +188,8 @@ public class Main {
         System.out.println(reply.getReplies().get(0));
     }
 
-    public static void getLandmarks(){
+    public static void getLandmarks(Scanner in){
         try {
-            Scanner in = new Scanner(System.in);
             System.out.println("Please enter requestId:");
             if(in.hasNext()) {
                 ImageId id = ImageId.newBuilder().setId(in.next()).build();
@@ -220,9 +217,9 @@ public class Main {
 
     }
 
-    public static void getLandmarksWithT(){
+    public static void getLandmarksWithT(Scanner in){
         try {
-            Scanner in = new Scanner(System.in);
+            System.out.println("Minimum certainty value: ");
             if(in.hasNextDouble()) {
                 ReplyObserver<LandmarkProtoResult> reply = new ReplyObserver<>();
                 GetImageNamesWithTRequest t = GetImageNamesWithTRequest.newBuilder().setT(in.nextDouble()).build();
@@ -247,9 +244,8 @@ public class Main {
 
     }
 
-    private static void getMap() {
+    private static void getMap(Scanner in) {
         try{
-            Scanner in = new Scanner(System.in);
             System.out.print("Please insert request id: ");
 
             if(in.hasNext()){
@@ -292,7 +288,7 @@ public class Main {
                         fout.flush();
                     }
                 }
-                System.out.println("Downloaded file to: " + target.getFileName());
+                System.out.println("Downloaded file to: " + DOWNLOAD_PATH + "/" + target.getFileName());
             }
         } catch (InterruptedException e) {
             logger.warning(e.getMessage());
