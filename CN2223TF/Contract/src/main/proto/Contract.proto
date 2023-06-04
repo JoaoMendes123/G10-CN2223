@@ -13,10 +13,11 @@ service Contract {
   rpc submitImage(Image) returns (stream ImageId);
   rpc getLandmarksFromRequest(ImageId) returns (stream LandmarkProtoResult);
   rpc getMap(MapChoice) returns (GetImageMap);
-  rpc getNamesFrnomTImage(GetImageNamesWithTRequest) returns (stream LandmarkProtoResult);
+  rpc getNamesFromTImage(GetImageNamesWithTRequest) returns (stream LandmarkProtoResult);
 }
 
 message Void {
+
 }
 
 // input messages
@@ -44,9 +45,14 @@ message IpReply {
   bool alive=1;
 }
 
+message ExistingIps {
+  repeated string ip = 1;
+}
+
 message ImageId {
   string id = 1;
 }
+
 
 message LandmarkProtoResult{
   string name = 1;
