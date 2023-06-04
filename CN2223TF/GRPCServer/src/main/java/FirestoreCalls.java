@@ -71,5 +71,22 @@ public class FirestoreCalls {
      * @param t - minimum score
      * @return list of results with > t
      */
-
+    public List<LandmarkResult> getLandmarkResultsWithT(double t){
+        ArrayList<LandmarkResult> results = new ArrayList<>();
+        Iterable<DocumentReference> docs = colRef.listDocuments();
+        docs.forEach(documentReference -> {
+            CollectionReference resultsCollection = documentReference.collection("results");
+            Query query = resultsCollection.whereGreaterThan("score", t);
+            ApiFuture<QuerySnapshot> snapshot = query.get();
+            try {
+                List<QueryDocumentSnapshot> resultsWithT = snapshot.get().getDocuments();
+                resultsWithT.forEach(result -> {
+                    results.add(result.toObject(LandmarkResult.class));
+                });
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return results;
+    }
 }
