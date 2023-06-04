@@ -10,7 +10,7 @@ package Contract; // package do proto
 
 service Contract {
   rpc isIpAlive(Void) returns (IpReply);
-  rpc submitImage(Image) returns (stream ImageId);
+  rpc submitImage(Image) returns (ImageId);
   rpc getLandmarksFromRequest(ImageId) returns (stream LandmarkProtoResult);
   rpc getMap(MapChoice) returns (GetImageMap);
   rpc getNamesFromTImage(GetImageNamesWithTRequest) returns (stream LandmarkProtoResult);
