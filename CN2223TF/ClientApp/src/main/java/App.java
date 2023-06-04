@@ -51,6 +51,55 @@ public class App {
     /**
      * Gets running instances available and picks a random ip to connect to.
      */
+    public static void connectToServer() {
+        String[] ips;
+        try {
+            ips = Utils.getRunningVMsIps();
+            IpReply alive;
+            do {
+                String pick = "localhost";
+                if(!RUN_LOCAL){
+                    if(ips.length == 0){
+                        System.out.println("Couldn't find any instances running...");
+                        System.exit(1);
+                    }
+                    int idx =  (int)(Math.random()*ips.length);
+                    if(!PICK_RANDOM_IP){
+                        System.out.println("Server Available:");
+                        for (int i = 0; i < ips.length; i++){
+                            System.out.format("\t%d - %s\n", i, ips[i]);
+                        }
+                        System.out.println("Select Server: [0..N]");
+                        Scanner in = new Scanner(System.in);
+                        if(in.hasNextInt()) {
+                            idx = in.nextInt();
+                        }
+                    }
+                    pick = ips[idx];
+                }
+                System.out.println("Connecting to " + pick);
+                channel = ManagedChannelBuilder.forAddress(pick, SERVER_PORT)
+                        .usePlaintext().build();
+                stub = ContractGrpc.newStub(channel);
+                //only to get status on the instance.
+                var blockingStub = ContractGrpc.newBlockingStub(channel);
+                alive = blockingStub.isIpAlive(Void.newBuilder().build());
+                if(alive.getAlive()) {
+                    isConnected = true;
+                    return;
+                }
+                //updates available ips
+                System.out.println("Failed to connect, trying again...");
+                channel.shutdown();
+                channel.awaitTermination(100, TimeUnit.MILLISECONDS);
+                ips = Utils.getRunningVMsIps();
+            }while (!alive.getAlive());
+        } catch (MalformedURLException | InterruptedException | io.grpc.StatusRuntimeException e) {
+            logger.warning("Check if server is on...");
+            throw new RuntimeException(e);
+        }
+
+    }
 
     public static void printMenu(Scanner in) {
         while(true){
