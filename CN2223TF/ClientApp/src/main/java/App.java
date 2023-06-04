@@ -16,13 +16,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 
-public class Main {
+public class App {
 
     private static Path DOWNLOAD_PATH = Path.of("./maps/");
     private static final int SERVER_PORT = 7001;
 
     private static ManagedChannel channel;
-    private static Logger logger = Logger.getLogger(Main.class.getName());
+    private static Logger logger = Logger.getLogger(App.class.getName());
     private static ContractGrpc.ContractStub stub;
 
     private static Boolean RUN_LOCAL = false;
@@ -32,12 +32,12 @@ public class Main {
         if(!Files.exists(DOWNLOAD_PATH))
             Files.createDirectories(DOWNLOAD_PATH);
         Scanner in = new Scanner(System.in);
-        System.out.println("Connect to localhost? [y/Y]");
+        System.out.println("Connect to localhost? [y/n]");
         if(in.hasNextLine()){
             if(in.nextLine().equalsIgnoreCase("y")) RUN_LOCAL=true;
         }
         if(!RUN_LOCAL){
-            System.out.println("Select a specific server?[y/Y]");
+            System.out.println("Select a specific server?[y/n]");
             if(in.hasNextLine() && in.nextLine().equalsIgnoreCase("y")) PICK_RANDOM_IP= false;
         }
         while(!isConnected){
@@ -228,6 +228,7 @@ public class Main {
                     logger.warning("waiting for server answer to complete...");
                     Thread.sleep(200);
                 }
+
                 for (LandmarkProtoResult res: reply.getReplies()) {
                     System.out.format("\n\tLandmark Name: %s\n\tCoordinates: \n\t\tLatitude =%,.10f\n\t\tLongitude =%,.10f\n\tscore:%,.10f\n",
                             res.getName(),

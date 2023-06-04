@@ -1,0 +1,66 @@
+@startuml
+package "ClientApp" {
+  [ReplyObserver]
+  [Utils]
+  [App]
+
+}
+
+node "Cloud Function" {
+}
+
+artifact "GRPContract" as Contract
+
+cloud {
+
+Node "VisionApp" {
+    package [DocumentObject]
+    [FirestoreCalls]
+    [LandmarksApp]
+    [LandmarksDetector]
+    [MessageHandler]
+    [StorageCalls] as SC
+
+}
+
+Node "GRPCServer" {
+    package "FirestoreObjects" {
+        [Coordinates]
+        [LandmarkResult]
+        [LoggingDocument]
+    }
+
+    [Server]
+
+    [ContractImplementation] as CI
+    [FirestoreCalls] as FS
+    [PubSubCalls] as PubSub
+
+    [StorageCalls] as SC
+
+
+    [Server] -down-  [PubSubCalls]
+
+
+
+
+
+}
+node Firestore{
+}
+
+node StorageCloud {
+}
+
+node Pub/Sub {
+}
+
+}
+[Contract] ..> GRPCServer : implements
+[Contract] ..> ClientApp : implements
+
+"Cloud Function" <--> "ClientApp" : getRunningVMsIps()
+"Cloud Function" <--> Server : instancegroups
+
+
+@enduml
