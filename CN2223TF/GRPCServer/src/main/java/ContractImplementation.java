@@ -34,7 +34,22 @@ public class ContractImplementation extends ContractGrpc.ContractImplBase {
     }
 
     @Override
+    public void submitImage(Image request, StreamObserver<ImageId> responseObserver) {
+        byte[] img = request.getImage().toByteArray();
+        try {
+            //RequestId to return to client for later interactions
+            String requestID = UUID.randomUUID().toString().substring(0,4);
+            String blobId = storage.uploadImageToBucket(img, request.getName(), request.getType());
+            pubSub.sendMessage(blobId, storage.getBucketName(), requestID);
 
+            responseObserver.onNext(ImageId.newBuilder().setId(requestID).build());
+            responseObserver.onCompleted();
+
+            logger.info("Completed submitImage()");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void getLandmarksFromRequest(ImageId request, StreamObserver<LandmarkProtoResult> responseObserver) {
