@@ -19,6 +19,25 @@ public class PubSubCalls {
         this.projectID = projectID;
     }
 
+    public void sendMessage(String blobId, String bucketName, String requestId) {
+        try {
+            String message = bucketName + ";" +
+                    blobId + ";" +
+                    requestId;
+            TopicName tName = TopicName.ofProjectTopicName(projectID, topicName);
+            Publisher publisher = Publisher.newBuilder(tName).build();
+            ByteString msgData = ByteString.copyFromUtf8(message);
+            PubsubMessage pubsubMessage = PubsubMessage.newBuilder()
+                    .setData(msgData)
+                    .build();
+            ApiFuture<String> future = publisher.publish(pubsubMessage);
+            String msgID = future.get();
+            logger.info("Message published on topic " + topicName + " with id: " + msgID);
+            publisher.shutdown();
 
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
